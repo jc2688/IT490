@@ -1,41 +1,74 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { testUsers } from '../test/testlogindata';
+import { Link } from 'react-router-dom';
 
-const Login = () => {
+const LoginForm = () => {
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      username: '',
+      password: ''
+    }
+  });
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  const onSubmit = (data) => {
+    const isValidUser = testUsers.some(
+      (user) => user.username === data.username && user.password === data.password
+    );
 
-    // Add logic to handle login here
+    if (isValidUser) {
+      setIsLoggedIn(true);
+    } else {
+      alert('Invalid username or password');
+    }
   };
-
 
   return (
     <div>
-      <h1>Login</h1>
-      <form onSubmit={handleLogin}>
+      {isLoggedIn ? (
         <div>
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+          <p>Welcome, {testUsers.find(user => user.username === control.getValues().username).username}!</p>
+          <Link to="/home">Go to Home</Link>
         </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
+      ) : (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Username */}
+          <div>
+            <label>Username:</label>
+            <Controller
+              name="username"
+              control={control}
+              defaultValue=""
+              rules={{ required: true }}
+              render={({ field }) => <input {...field} type="text" />}
+            />
+            {errors.username && (
+              <div className="error">Username is required.</div>
+            )}
+          </div>
+
+          {/* Password */}
+          <div>
+            <label>Password:</label>
+            <Controller
+              name="password"
+              control={control}
+              defaultValue=""
+              rules={{ required: true }}
+              render={({ field }) => <input {...field} type="password" />}
+            />
+            {errors.password && (
+              <div className="error">Password is required.</div>
+            )}
+          </div>
+
+          <button type="submit">Login</button>
+        </form>
+      )}
     </div>
   );
 };
 
-export default Login;
+export default LoginForm;

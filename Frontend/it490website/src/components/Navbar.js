@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 const Navbar = () => {
   return (
@@ -11,7 +11,12 @@ const Navbar = () => {
         <li>
           <Link to="/Login">Login</Link>
         </li>
+        <li>
+          <Link to="/register">Register</Link>
+        </li>
       </ul>
+      <hr />
+      <Outlet /> {/* This is where nested routes will be rendered */}
     </nav>
   );
 };
