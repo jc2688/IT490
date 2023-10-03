@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { testUsers } from '../test/testlogindata';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const { control, handleSubmit, formState: { errors } } = useForm({
@@ -12,6 +12,7 @@ const LoginForm = () => {
   });
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate(); // Add this line
 
   const onSubmit = (data) => {
     const isValidUser = testUsers.some(
@@ -23,6 +24,11 @@ const LoginForm = () => {
     } else {
       alert('Invalid username or password');
     }
+  };
+
+  // Function to navigate to the registration page
+  const goToRegister = () => {
+    navigate('/register');
   };
 
   return (
@@ -65,6 +71,7 @@ const LoginForm = () => {
           </div>
 
           <button type="submit">Login</button>
+          <button type="button" onClick={goToRegister}>Go to Register</button> {/* Add this button */}
         </form>
       )}
     </div>
@@ -72,3 +79,4 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
+
