@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { testUsers } from '../test/testlogindata';
 import { Link, useNavigate } from 'react-router-dom';
+import { useUser } from '../components/StoreUser';
 
 const LoginForm = () => {
   const { control, handleSubmit, formState: { errors } } = useForm({
@@ -11,32 +12,29 @@ const LoginForm = () => {
     }
   });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
+  const { isLoggedIn, loginUser } = useUser();
   const navigate = useNavigate(); 
 
   const onSubmit = (data) => {
-    const isValidUser = testUsers.some(
-      (user) => user.username === data.username && user.password === data.password
-    );
+    const user = testUsers.find(user => user.username === data.username);
   
-    if (isValidUser) {
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', data.username);
-
-      setIsLoggedIn(true);
-      setUsername(data.username);
-      navigate('/');
-    } else {
+    if (!user || user.password !== data.password) {
       alert('Invalid username or password');
+      return;
     }
-  };
   
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('username', data.username);
+  
+    loginUser(data.username);
+    navigate('/');
+  };
 
-  // Function to navigate to the registration page
   const goToRegister = () => {
     navigate('/register');
   };
+
+  const username = localStorage.getItem('username');
 
   return (
     <div>
@@ -47,7 +45,6 @@ const LoginForm = () => {
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Username */}
           <div>
             <label>Username:</label>
             <Controller
@@ -62,7 +59,6 @@ const LoginForm = () => {
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label>Password:</label>
             <Controller
@@ -78,7 +74,7 @@ const LoginForm = () => {
           </div>
 
           <button type="submit">Login</button>
-          <button type="button" onClick={goToRegister}>Go to Register</button> {/* Add this button */}
+          <button type="button" onClick={goToRegister}>Go to Register</button>
         </form>
       )}
     </div>
