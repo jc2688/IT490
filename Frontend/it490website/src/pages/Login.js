@@ -12,7 +12,8 @@ const LoginForm = () => {
   });
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate(); // Add this line
+  const [username, setUsername] = useState('');
+  const navigate = useNavigate(); 
 
   const onSubmit = (data) => {
     const isValidUser = testUsers.some(
@@ -20,8 +21,12 @@ const LoginForm = () => {
     );
   
     if (isValidUser) {
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('username', data.username);
+
       setIsLoggedIn(true);
-      navigate('/'); // Redirect to the home screen
+      setUsername(data.username);
+      navigate('/');
     } else {
       alert('Invalid username or password');
     }
@@ -37,7 +42,7 @@ const LoginForm = () => {
     <div>
       {isLoggedIn ? (
         <div>
-          <p>Welcome, {testUsers.find(user => user.username === control.getValues().username).username}!</p>
+          <p>Welcome, {username}!</p>
           <Link to="/">Go to Home</Link>
         </div>
       ) : (
