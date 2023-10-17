@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import {testUsers} from '../test/testlogindata';
-import { Link } from 'react-router-dom'; // Add this line
+import { testUsers } from '../test/testlogindata';
+import { Link } from 'react-router-dom';
 
 const RegistrationForm = () => {
-    const { control, handleSubmit, watch, formState: { errors }, } = useForm({
-        defaultValues: {
-          username: '',
-          email: '',
-          password: '',
-          confirmPassword: ''
-        }
-      });
+  const { control, handleSubmit, watch, formState: { errors } } = useForm({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      address: '',
+      country: '',
+      state: '',
+      city: ''
+    }
+  });
+  
   const [isRegistered, setIsRegistered] = useState(false);
   const [errorMessages, setErrorMessages] = useState({
     username: '',
@@ -21,31 +28,49 @@ const RegistrationForm = () => {
   });
 
   const handleRegistration = async (data) => {
-    const userWithSameUsername = testUsers.find(user => user.username === data.username);
-    const userWithSameEmail = testUsers.find(user => user.email === data.email);
-  
+    const { username, email, firstName, lastName, address, country, state, city } = data;
+    
+    if (!firstName || !lastName || !address || !country || !state || !city) {
+      setErrorMessages(prevState => ({ ...prevState, username: 'Please fill in all required fields.' }));
+      return;
+    }
+
+    const userWithSameUsername = testUsers.find(user => user.username === username);
+    const userWithSameEmail = testUsers.find(user => user.email === email);
+
     if (userWithSameUsername) {
       setErrorMessages(prevState => ({ ...prevState, username: 'User with this username already exists.' }));
+      return;
     } else {
       setErrorMessages(prevState => ({ ...prevState, username: '' }));
     }
-  
+
     if (userWithSameEmail) {
       setErrorMessages(prevState => ({ ...prevState, email: 'User with this email address already exists.' }));
+      return;
     } else {
       setErrorMessages(prevState => ({ ...prevState, email: '' }));
     }
-  
-    if (!userWithSameUsername && !userWithSameEmail) {
-      // Continue with registration logic
-      try {
-        setIsRegistered(true);
-      } catch (error) {
-        console.error('Error sending registration data to RabbitMQ:', error);
-      }
+
+    const newUser = {
+      firstName,
+      lastName,
+      username,
+      email,
+      password: data.password,
+      address,
+      country,
+      state,
+      city
+    };
+
+    try {
+      testUsers.push(newUser);
+      setIsRegistered(true);
+    } catch (error) {
+      console.error('Error sending registration data to RabbitMQ:', error);
     }
   };
-  
 
   const onSubmit = async (data) => {
     console.log('Form data:', data);
@@ -58,8 +83,14 @@ const RegistrationForm = () => {
       setErrorMessages(prevState => ({ ...prevState, password: '' }));
     }
   
+    if (data.password !== data.confirmPassword) {
+      setErrorMessages(prevState => ({ ...prevState, confirmPassword: 'Passwords do not match.' }));
+      isValid = false;
+    } else {
+      setErrorMessages(prevState => ({ ...prevState, confirmPassword: '' }));
+    }
+
     if (isValid) {
-      console.log('Form is valid. Submitting...');
       handleRegistration(data);
     }
   };
@@ -69,11 +100,32 @@ const RegistrationForm = () => {
       {isRegistered ? (
         <div>
           <p>Account has been successfully registered.</p>
-          <Link to="/Login">Back to Login</Link> {/* Add this line */}
+          <Link to="/Login">Back to Login</Link>
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Username */}
+          <div>
+            <label>First Name:</label>
+            <Controller
+              name="firstName"
+              control={control}
+              defaultValue=""
+              rules={{ required: true }}
+              render={({ field }) => <input {...field} type="text" />}
+            />
+          </div>
+
+          <div>
+            <label>Last Name:</label>
+            <Controller
+              name="lastName"
+              control={control}
+              defaultValue=""
+              rules={{ required: true }}
+              render={({ field }) => <input {...field} type="text" />}
+            />
+          </div>
+
           <div>
             <label>Username:</label>
             <Controller
@@ -94,7 +146,6 @@ const RegistrationForm = () => {
             )}
           </div>
 
-          {/* Email */}
           <div>
             <label>Email:</label>
             <Controller
@@ -115,35 +166,29 @@ const RegistrationForm = () => {
             )}
           </div>
 
-                {/* Password */}
-                <div>
-                    <label>Password:</label>
-                    <Controller
-                        name="password"
-                        control={control}
-                        defaultValue=""
-                        rules={{
-                        required: true,
-                        validate: (value) => {
-                            return (
-                            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value) ||
-                            'Password must have at least one uppercase letter, one lowercase letter, one number, and one special character.'
-                            );
-                        }
-                        }}
-                        render={({ field }) => <input {...field} type="password" />}
-                    />
-                    {errors.password && (
-                        <div className="error">{errors.password.message}</div>
-                    )}
-                    {errorMessages.password && (
-                        <div className="error">{errorMessages.password}</div>
-                    )}
-                </div>
+          <div>
+            <label>Password:</label>
+            <Controller
+              name="password"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: true,
+                validate: (value) => {
+                  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value) ||
+                    'Password must have at least one uppercase letter, one lowercase letter, one number, and one special character.';
+                }
+              }}
+              render={({ field }) => <input {...field} type="password" />}
+            />
+            {errors.password && (
+              <div className="error">{errors.password.message}</div>
+            )}
+            {errorMessages.password && (
+              <div className="error">{errorMessages.password}</div>
+            )}
+          </div>
 
-     
-    
-          {/* Confirm Password */}
           <div>
             <label>Confirm Password:</label>
             <Controller
@@ -158,6 +203,53 @@ const RegistrationForm = () => {
             {errors.confirmPassword && (
               <div className="error">Passwords do not match.</div>
             )}
+            {errorMessages.confirmPassword && (
+              <div className="error">{errorMessages.confirmPassword}</div>
+            )}
+          </div>
+
+          <div>
+            <label>Address:</label>
+            <Controller
+              name="address"
+              control={control}
+              defaultValue=""
+              rules={{ required: true }}
+              render={({ field }) => <input {...field} type="text" />}
+            />
+          </div>
+
+          <div>
+            <label>Country:</label>
+            <Controller
+              name="country"
+              control={control}
+              defaultValue=""
+              rules={{ required: true }}
+              render={({ field }) => <input {...field} type="text" />}
+            />
+          </div>
+
+          <div>
+            <label>State:</label>
+            <Controller
+              name="state"
+              control={control}
+              defaultValue=""
+              rules={{ required: true }}
+              render={({ field }) => <input {...field} type="text" />}
+            />
+          </div>
+
+          <div>
+            <label>City:</label>
+            <Controller
+              name="city"
+              control={control}
+              defaultValue=""
+              rules={{ required: true }}
+              render={({ field }) => <input {...field} type="text" />}
+            />
           </div>
 
           <button type="submit">Register</button>
