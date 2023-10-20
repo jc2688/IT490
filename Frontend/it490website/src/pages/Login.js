@@ -3,6 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { testUsers } from '../test/testlogindata';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../components/StoreUser';
+import { connectToRabbitMQ } from './rabbitmq'; // Import the RabbitMQ connection
 
 const LoginForm = () => {
   const { control, handleSubmit, formState: { errors } } = useForm({
@@ -12,26 +13,27 @@ const LoginForm = () => {
     }
   });
 
-  const { isLoggedIn, loginUser } = useUser();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const user = testUsers.find(user => user.username === data.username);
-  
+
     if (!user || user.password !== data.password) {
       alert('Invalid username or password');
       return;
     }
-  
+
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('username', data.username);
-  
-    loginUser(data.username);
-    navigate('/');
-  };
 
-  const goToRegister = () => {
-    navigate('/register');
+    // Connect to RabbitMQ
+    const { channel } = await connectToRabbitMQ();
+
+    // Publish the message
+    const message = JSON.stringify(data);
+    channel.sendToQueue('login_queue', Buffer.from(message));
+
+    navigate('/');
   };
 
   const username = localStorage.getItem('username');
