@@ -3,7 +3,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { testUsers } from '../test/testlogindata';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../components/StoreUser';
-import { connectToRabbitMQ } from './rabbitmq'; // Import the RabbitMQ connection
 
 const LoginForm = () => {
   const { control, handleSubmit, formState: { errors } } = useForm({
@@ -14,6 +13,7 @@ const LoginForm = () => {
   });
 
   const navigate = useNavigate();
+  const { isLoggedIn, loginUser } = useUser(); // Use the useUser hook
 
   const onSubmit = async (data) => {
     const user = testUsers.find(user => user.username === data.username);
@@ -23,20 +23,40 @@ const LoginForm = () => {
       return;
     }
 
+    // Call the loginUser function from useUser to set isLoggedIn to true
+    loginUser(data.username);
+
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('username', data.username);
 
-    // Connect to RabbitMQ
-    const { channel } = await connectToRabbitMQ();
+    try {
+      const response = await fetch('http://10.244.1.6:7007/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password, // Send the password (not hashed) to the server
+        }),
+      });
 
-    // Publish the message
-    const message = JSON.stringify(data);
-    channel.sendToQueue('login_queue', Buffer.from(message));
+      if (!response.ok) {
+        throw new Error('Error sending data to server');
+      }
+    } catch (error) {
+      console.error('Error connecting to server:', error);
+      alert('Cannot connect to server');
+    }
 
     navigate('/');
   };
 
   const username = localStorage.getItem('username');
+
+  const goToRegister = () => {
+    navigate('/register');
+  };
 
   return (
     <div>
