@@ -7,7 +7,7 @@ const HomeScreen = () => {
 
   const sendToServer = async () => {
     try {
-      const response = await fetch('http://localhost:3001/homescreen', {
+      const response = await fetch('http://10.244.1.6:7007/homescreen', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
