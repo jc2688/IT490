@@ -19,6 +19,8 @@ app.post('/login', async (req, res) => {
     const message = JSON.stringify({ username, password });
     channel.sendToQueue('login_queue', Buffer.from(message));
 
+
+
     return res.json({ success: true });
   } catch (error) {
     console.error('Error connecting to RabbitMQ:', error);
