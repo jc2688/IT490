@@ -2,7 +2,7 @@ const amqp = require('amqplib/callback_api');
 
 const connectToRabbitMQ = async () => {
   try {
-    const connection = await amqp.connect('amqp://localhost');
+    const connection = await amqp.connect('amqp://10.244.1.4:5672');
 
     if (!connection) {
       throw new Error('Failed to establish connection to RabbitMQ');

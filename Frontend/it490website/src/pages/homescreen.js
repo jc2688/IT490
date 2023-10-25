@@ -1,3 +1,5 @@
+// src/pages/homescreen.js
+
 import React, { useState } from 'react';
 
 const HomeScreen = () => {
@@ -5,13 +7,13 @@ const HomeScreen = () => {
 
   const sendToServer = async () => {
     try {
-      const response = await fetch('http://localhost:3001/sendMessage', {
+      const response = await fetch('http://localhost:3001/homescreen', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          type: 'rabbitTest',
+          type: 'testRabbit', // Updated type
           message: 'Hello World'
         })
       });
@@ -24,7 +26,7 @@ const HomeScreen = () => {
       }
     } catch (error) {
       console.error('Error connecting to server:', error);
-      alert('Cannot connect to server');
+      setResponse({ error: 'Cannot connect to server' });
     }
   };
 
@@ -36,7 +38,11 @@ const HomeScreen = () => {
       {response && (
         <div>
           <h2>Response from Server:</h2>
-          <pre>{JSON.stringify(response, null, 2)}</pre>
+          {response.error ? (
+            <div style={{ color: 'red' }}>{response.error}</div>
+          ) : (
+            <pre>{JSON.stringify(response, null, 2)}</pre>
+          )}
         </div>
       )}
     </div>
