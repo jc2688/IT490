@@ -4,10 +4,10 @@ const HomeScreen = () => {
   const [response, setResponse] = useState(null);
 
   const sendToServer = async () => {
-    console.log('Sending request to server...'); // Add this line
+    console.log('Sending request to server...');
 
     try {
-      const response = await fetch('http://10.244.1.6:7007/homescreen', {
+      const response = await fetch('http://10.244.1.6:7007/api/homescreen', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

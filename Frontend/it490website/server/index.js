@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post('/homescreen', async (req, res) => {
+app.post('/api/homescreen', async (req, res) => { // Adjusted route
   try {
     // Simulating a successful connection to RabbitMQ
     const connection = true;
