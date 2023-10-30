@@ -38,6 +38,8 @@ const connectToRabbitMQ = () => {
 
 app.post('/homescreen', async (req, res) => {
   try {
+    console.log('Received request:', req.body);
+
     const { type, message } = req.body;
 
     const dbQueueMessage = JSON.stringify({ type, message });
@@ -47,7 +49,9 @@ app.post('/homescreen', async (req, res) => {
       channel.sendToQueue('dbQueue', Buffer.from(dbQueueMessage)); // Send message to RabbitMQ
     }
 
-    return res.json({ success: true, dbQueueMessage });
+    // Send an immediate response to the client
+    res.json({ success: true, message: 'Request received, processing in progress' });
+
   } catch (error) {
     console.error('Error connecting to RabbitMQ:', error);
     return res.status(500).json({ error: 'Cannot connect to messenger' });
@@ -61,4 +65,3 @@ app.get('/', (req, res) => {
 app.listen(3001, () => {
   console.log('Backend server is running on http://10.244.1.6:3001');
 });
-
