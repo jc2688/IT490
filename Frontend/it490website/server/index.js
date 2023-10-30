@@ -58,6 +58,19 @@ app.post('/homescreen', async (req, res) => {
   }
 });
 
+app.get('/testrabbit', async (req, res) => {
+  try {
+    const channel = await connectToRabbitMQ();
+    if (channel) {
+      return res.json({ success: true, message: 'Connected to RabbitMQ' });
+    }
+    return res.status(500).json({ error: 'Failed to connect to RabbitMQ' });
+  } catch (error) {
+    console.error('Error connecting to RabbitMQ:', error);
+    return res.status(500).json({ error: 'Cannot connect to messenger' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('Welcome to the homepage');
 });
