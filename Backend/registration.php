@@ -1,11 +1,14 @@
 <?php
-// Database connection
 require_once('dbConnect.php');
 
-if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
+function dbConnect() {
+    global $mysqli;
+    return $mysqli;
+}
 
-    // Validate user data
+function registerUser($data) {
+    $mysqli = dbConnect();
+
     $requiredFields = ['FirstName', 'LastName', 'Username', 'Email', 'Address', 'City', 'Country', 'ZipCode', 'PasswordHash'];
     foreach ($requiredFields as $field) {
         if (!isset($data[$field]) || empty($data[$field])) {
@@ -23,10 +26,10 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
     $city = $data['City'];
     $country = $data['Country'];
     $zipCode = $data['ZipCode'];
-    $passwordHash = password_hash($data['PasswordHash'], PASSWORD_BCRYPT); // Hash the password
+    $passwordHash = password_hash($data['PasswordHash'], PASSWORD_BCRYPT);
 
-    // Check if the username or email is already in database
-    $query = "SELECT id FROM users WHERE Username = ? OR Email = ?";
+    // Check if the username or email is already in the database
+    $query = "SELECT id FROM Accounts WHERE Username = ? OR Email = ?";
     if ($stmt = $mysqli->prepare($query)) {
         $stmt->bind_param("ss", $username, $email);
         $stmt->execute();
@@ -41,8 +44,8 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
         $stmt->close();
     }
 
-    // Insert the data into database
-    $insertQuery = "INSERT INTO Accoutns (FirstName, LastName, Username, Email, Address, City, Country, ZipCode, PasswordHash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // Insert the data into the database
+    $insertQuery = "INSERT INTO Accounts (FirstName, LastName, Username, Email, Address, City, Country, ZipCode, PasswordHash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     if ($insertStmt = $mysqli->prepare($insertQuery)) {
         $insertStmt->bind_param("sssssssss", $firstName, $lastName, $username, $email, $address, $city, $country, $zipCode, $passwordHash);
         if ($insertStmt->execute()) {
@@ -55,4 +58,18 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
         $insertStmt->close();
     }
 }
+
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    if (!isset($data['Username']) || !isset($data['PasswordHash'])) {
+        http_response_code(400);
+        echo json_encode(["message" => "Missing username or password"]);
+        exit;
+    }
+
+    registerUser($data);
+}
+
 $mysqli->close();
+?>
