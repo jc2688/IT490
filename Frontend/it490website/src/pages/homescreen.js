@@ -7,7 +7,7 @@ const HomeScreen = () => {
     console.log('Sending request to server...'); // Add this line
 
     try {
-      const response = await fetch('http://10.244.1.6:3001/homescreen', {
+      const response = await fetch('http://10.244.1.6:7007/homescreen', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
