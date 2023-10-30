@@ -24,7 +24,8 @@
     "start-client": "react-app-rewired start",
     "start-server": "node server/index.js",
     "start": "npm run start-client & npm run start-server",
-    "build": "react-app-rewired build",
+    "build": "react-app-rewired build && sudo rm -rf /www/* && sudo cp -r build/* /www",
+    "build2": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject"
   },
