@@ -32,6 +32,11 @@ app.post('/homescreen', async (req, res) => {
   }
 });
 
+app.get("/", (reg, res) => {
+	res.send("welcome to the homepage");
+});
+
 app.listen(3001, () => {
   console.log('Backend server is running on http://10.244.1.6:3001');
 });
+
