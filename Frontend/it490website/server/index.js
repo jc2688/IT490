@@ -10,7 +10,7 @@ app.use(express.json());
 const connectToRabbitMQ = () => {
   return new Promise((resolve, reject) => {
     try {
-      amqp.connect('amqp://10.244.1.4', (error, connection) => {
+      amqp.connect('amqp://jdiaz:rabbit.pwd@10.244.1.4', (error, connection) => {
         if (error) {
           console.error('Error connecting to RabbitMQ:', error);
           reject(error);
