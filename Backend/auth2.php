@@ -1,7 +1,11 @@
 <?php
 require_once('dbConnect.php');
+function dbConnect() {
+    $mysqli = dbConnect(); 
+}
 
-function validateLogin($username, $password, $mysqli) {
+function validateLogin($username, $password) {
+    $mysqli = dbConnect(); 
     $query = "SELECT PasswordHash FROM Accounts WHERE username = ?";
     
     if ($stmt = $mysqli->prepare($query)) {
