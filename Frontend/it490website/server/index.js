@@ -1,27 +1,39 @@
 const express = require('express');
 const cors = require('cors');
-const amqp = require('amqplib/callback_api'); // Added amqp import
+const amqp = require('amqplib'); // Changed import to use Promises
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const connectToRabbitMQ = async () => {
-  try {
-    const connection = await amqp.connect('amqp://10.244.1.4'); // Connect to RabbitMQ server
-    const channel = await connection.createChannel(); // Create a channel
-    
-    const queue = 'dbQueue'; // Specify the queue name
+const connectToRabbitMQ = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      amqp.connect('amqp://10.244.1.4', (error, connection) => {
+        if (error) {
+          console.error('Error connecting to RabbitMQ:', error);
+          reject(error);
+          return;
+        }
 
-    // Assert the queue, this makes sure the queue exists
-    channel.assertQueue(queue, { durable: false });
-    
-    return channel; // Return the channel for use in sending messages
-  } catch (error) {
-    console.error('Error connecting to RabbitMQ:', error);
-    return null;
-  }
+        connection.createChannel((channelError, channel) => {
+          if (channelError) {
+            console.error('Error creating channel:', channelError);
+            reject(channelError);
+            return;
+          }
+
+          const queue = 'dbQueue';
+          channel.assertQueue(queue, { durable: false });
+          resolve(channel);
+        });
+      });
+    } catch (error) {
+      console.error('Error connecting to RabbitMQ:', error);
+      reject(error);
+    }
+  });
 };
 
 app.post('/homescreen', async (req, res) => {
@@ -49,3 +61,4 @@ app.get('/', (req, res) => {
 app.listen(3001, () => {
   console.log('Backend server is running on http://10.244.1.6:3001');
 });
+
