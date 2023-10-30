@@ -1,18 +1,14 @@
-// server/index.js
-
 const express = require('express');
 const cors = require('cors');
 
 const app = express();
 
 app.use(cors());
-app.use(express.json()); // Parse JSON requests
+app.use(express.json());
 
 app.post('/homescreen', async (req, res) => {
   try {
     // Simulating a successful connection to RabbitMQ
-    // This is a placeholder for your RabbitMQ logic
-    // Replace this with your actual RabbitMQ logic
     const connection = true;
     const channel = true;
 
@@ -22,7 +18,6 @@ app.post('/homescreen', async (req, res) => {
 
     const { type, message } = req.body;
 
-    // Simulated RabbitMQ logic
     const dbQueueMessage = JSON.stringify({ type, message });
 
     return res.json({ success: true, dbQueueMessage });
@@ -32,11 +27,10 @@ app.post('/homescreen', async (req, res) => {
   }
 });
 
-app.get("/", (reg, res) => {
-	res.send("welcome to the homepage");
+app.get('/', (req, res) => {
+  res.send('Welcome to the homepage');
 });
 
 app.listen(3001, () => {
   console.log('Backend server is running on http://10.244.1.6:3001');
 });
-

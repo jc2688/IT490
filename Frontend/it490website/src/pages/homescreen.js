@@ -1,19 +1,19 @@
-// src/pages/homescreen.js
-
 import React, { useState } from 'react';
 
 const HomeScreen = () => {
   const [response, setResponse] = useState(null);
 
   const sendToServer = async () => {
+    console.log('Sending request to server...'); // Add this line
+
     try {
-      const response = await fetch('http://10.244.1.6:7007/homescreen', {
+      const response = await fetch('http://10.244.1.6:3001/homescreen', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          type: 'testRabbit', // Updated type
+          type: 'testRabbit',
           message: 'Hello World'
         })
       });
