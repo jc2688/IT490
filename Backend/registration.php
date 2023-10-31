@@ -50,10 +50,12 @@ function registerUser($data) {
         $insertStmt->bind_param("sssssssss", $firstName, $lastName, $username, $email, $address, $city, $country, $zipCode, $passwordHash);
         if ($insertStmt->execute()) {
             http_response_code(201); // Created
-            echo json_encode(["message" => "User registered successfully"]);
+            //echo json_encode(["message" => "User registered successfully"]);
+            return json_encode(array("returnCode" => '1', 'message' => "User registered successfully Username already exists, try again"));
         } else {
             http_response_code(500);
-            echo json_encode(["message" => "Failed to register user"]);
+            //echo json_encode(["message" => "Failed to register user"]);
+            return json_encode(array("returnCode" => '0', 'message' => "Username already exists, try again"));
         }
         $insertStmt->close();
     }
