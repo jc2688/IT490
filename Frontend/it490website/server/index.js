@@ -10,31 +10,47 @@ app.use(express.json());
 const connectToRabbitMQ = () => {
   return new Promise((resolve, reject) => {
     try {
-      amqp.connect('amqp://jdiaz:rabbit.pwd@10.244.1.4:5672', (error, connection) => {
-        if (error) {
-          console.error('Error connecting to RabbitMQ:', error);
-          reject(error);
-          return;
-        }
+      // Read the configuration from [database] section
+      const connectionDetails = {
+        BROKER_HOST: '10.244.1.4',
+        BROKER_PORT: 5672,
+        USER: 'jdiaz',
+        PASSWORD: 'rabbit.pwd',
+        VHOST: 'main',
+        EXCHANGE: 'amq.direct',
+        QUEUE: 'dbQueue',
+        EXCHANGE_TYPE: 'direct',
+        AUTO_DELETE: true
+      };
 
-        connection.createChannel((channelError, channel) => {
-          if (channelError) {
-            console.error('Error creating channel:', channelError);
-            reject(channelError);
-            return;
-          }
-
-          const queue = 'dbQueue';
+      const connectionUrl = `amqp://${connectionDetails.USER}:${connectionDetails.PASSWORD}@${connectionDetails.BROKER_HOST}:${connectionDetails.BROKER_PORT}`;
+      amqp.connect(connectionUrl)
+        .then((connection) => {
+          return connection.createChannel();
+        })
+        .then((channel) => {
+          const queue = connectionDetails.QUEUE;
           channel.assertQueue(queue, { durable: false });
           resolve(channel);
+        })
+        .catch((error) => {
+          console.error('Error connecting to RabbitMQ:', error);
+          reject(error);
         });
-      });
     } catch (error) {
       console.error('Error connecting to RabbitMQ:', error);
       reject(error);
     }
   });
 };
+
+// Rest of your code remains the same...
+
+
+
+
+
+
 
 app.post('/homescreen', async (req, res) => {
   try {
