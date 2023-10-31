@@ -62,8 +62,10 @@ app.get('/testrabbit', async (req, res) => {
   try {
     const channel = await connectToRabbitMQ();
     if (channel) {
+      console.log('Connected to RabbitMQ');
       return res.json({ success: true, message: 'Connected to RabbitMQ' });
     }
+    console.log('Failed to connect to RabbitMQ');
     return res.status(500).json({ error: 'Failed to connect to RabbitMQ' });
   } catch (error) {
     console.error('Error connecting to RabbitMQ:', error);
