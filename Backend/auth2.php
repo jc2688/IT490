@@ -28,7 +28,8 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
     
     if (!isset($data['username']) || !isset($data['password'])) {
         http_response_code(400);
-        echo json_encode(["message" => "Missing username or password"]);
+        //echo json_encode(["message" => "Missing username or password"]);
+        return json_encode(array("returnCode" => '0', 'message' => "Username already exists, try again"));
         exit;
     }
 
@@ -38,7 +39,8 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
     $result = validateLogin($username, $password, $mysqli);
 
     http_response_code($result['status']);
-    echo json_encode(["message" => $result['message']]);
+    //echo json_encode(["message" => $result['message']]);
+    return json_encode(array("returnCode" => '1', 'message' => "Success!"));
 }
 
 $mysqli->close();
