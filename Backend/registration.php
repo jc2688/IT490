@@ -6,9 +6,10 @@ function dbConnect() {
     return $mysqli;
 }
 
-function registerUser($data) {
+function registerUser($firstname, $lastname, $username, $email, $address, $city, $country, $zipcode, $passwordhash) {
     $mysqli = dbConnect();
 
+/*
     $requiredFields = ['FirstName', 'LastName', 'Username', 'Email', 'Address', 'City', 'Country', 'ZipCode', 'PasswordHash'];
     foreach ($requiredFields as $field) {
         if (!isset($data[$field]) || empty($data[$field])) {
@@ -17,16 +18,16 @@ function registerUser($data) {
             exit;
         }
     }
-
-    $firstName = $data['FirstName'];
-    $lastName = $data['LastName'];
-    $username = $data['Username'];
-    $email = $data['Email'];
-    $address = $data['Address'];
-    $city = $data['City'];
-    $country = $data['Country'];
-    $zipCode = $data['ZipCode'];
-    $passwordHash = password_hash($data['PasswordHash'], PASSWORD_BCRYPT);
+*/
+    $firstName = $firstname;
+    $lastName = $lastname;
+    $username = $username;
+    $email = $email;
+    $address = $address;
+    $city = $city;
+    $country = $country;
+    $zipCode = $zipcode;
+    $passwordHash = $passwordhash;
 
     // Check if the username or email is already in the database
     $query = "SELECT id FROM Accounts WHERE Username = ? OR Email = ?";
