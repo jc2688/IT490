@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="navigation"></div>
-    
+    <div id="navbar-container"></div> <!-- This is where the navbar will be loaded -->
+
     <div id="error"></div>
-    
+
     <div>
         <form id="register">
             <h4>Register</h4>
@@ -57,40 +57,53 @@
     </div>
     
     <script>
-        let form = $("#register");
-        let error = $("#error");
+        // Load the navbar component
+        const navbarContainer = document.getElementById('navbar-container');
 
-        form.on("submit", async function (event) {
-            event.preventDefault();
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'navbar.html', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                navbarContainer.innerHTML = xhr.responseText;
 
-            let formData = new FormData(form[0]);
-            formData.append("type", "register");
-            console.log("Trying registration");
+                // Continue with your existing JavaScript code
+                let form = $("#register");
+                let error = $("#error");
 
-            try {
-                let response = await $.ajax({
-                    url: 'userRegistration.php',
-                    method: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json'
+                form.on("submit", async function (event) {
+                    event.preventDefault();
+
+                    let formData = new FormData(form[0]);
+                    formData.append("type", "register");
+                    console.log("Trying registration");
+
+                    try {
+                        let response = await $.ajax({
+                            url: 'RabbitMQ/userRegistration.php',
+                            method: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            dataType: 'json'
+                        });
+
+                        console.log(response);
+                        showMessage(response.message, response.returnCode == "1" ? "success" : "error");
+
+                        if (response.returnCode == "1") {
+                            location.href = "index.html";
+                        }
+                    } catch (error) {
+                        showMessage(error.message, "error");
+                    }
                 });
 
-                console.log(response);
-                showMessage(response.message, response.returnCode == "1" ? "success" : "error");
-
-                if (response.returnCode == "1") {
-                    location.href = "index.html";
+                function showMessage(message, result) {
+                    error.html("<div class='alert alert-" + result + "'>" + message + "</div>");
                 }
-            } catch (error) {
-                showMessage(error.message, "error");
             }
-        });
-
-        function showMessage(message, result) {
-            error.html("<div class='alert alert-" + result + "'>" + message + "</div>");
-        }
+        };
+        xhr.send();
     </script>
 </body>
 </html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Information</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <h1 id="movie-title"></h1>
+
+    <div id="movie-info">
+        <p><strong>Genre:</strong> <span id="genre"></span></p>
+        <p><strong>Director:</strong> <span id="director"></span></p>
+        <p><strong>Year:</strong> <span id="year"></span></p>
+        <p><strong>Bio:</strong> <span id="bio"></span></p>
+    </div>
+
+    <div id="reviews-container">
+        <h2>Reviews</h2>
+        <ul id="reviews-list"></ul>
+    </div>
+
+    <button id="add-to-watchlist">Add to Watchlist</button>
+
+    <script>
+        // Load the navbar component
+        const navbarContainer = document.getElementById('navbar-container');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'navbar.html', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                navbarContainer.innerHTML = xhr.responseText;
+                loadMovieInfo();
+            }
+        };
+        xhr.send();
+
+        function loadMovieInfo() {
+            // Get the movie title from the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const movieTitle = urlParams.get('title');
+            if (movieTitle) {
+                $('#movie-title').text(movieTitle);
+
+                // Request movie info from getMovieInfo.php
+                $.ajax({
+                    url: 'RabbitMQ/getMovieInfo.php', // Replace with actual URL
+                    method: 'GET',
+                    dataType: 'json',
+                    data: { title: movieTitle },
+                    success: function (result) {
+                        if (result) {
+                            $('#genre').text(result.genre);
+                            $('#director').text(result.director);
+                            $('#year').text(result.year);
+                            $('#bio').text(result.bio);
+                        }
+                    },
+                    error: function () {
+                        console.log("Error loading movie info");
+                    }
+                });
+            }
+        }
+
+        $('#add-to-watchlist').click(function () {
+            const movieTitle = $('#movie-title').text();
+            addToWatchlist(movieTitle);
+        });
+
+        function addToWatchlist(movieTitle) {
+            // Send the movie title to RabbitMQ for processing
+            $.ajax({
+                url: 'RabbitMQ/addMovieToWatchlist.php', // Replace with actual URL
+                method: 'POST',
+                data: { title: movieTitle },
+                success: function () {
+                    // Handle success (optional)
+                    console.log(`Movie added to watchlist: ${movieTitle}`);
+                },
+                error: function () {
+                    console.log("Error adding movie to watchlist");
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

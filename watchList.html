@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Watchlist</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <h1>Watchlist</h1>
+
+    <div id="watchlist-container">
+        <!-- Watchlist content will be loaded here -->
+    </div>
+
+    <script>
+        // Load the navbar component
+        const navbarContainer = document.getElementById('navbar-container');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'navbar.html', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                navbarContainer.innerHTML = xhr.responseText;
+
+                // Call other functions after the navbar is loaded (if needed)
+                loadWatchlistData();
+            }
+        };
+        xhr.send();
+
+        function loadWatchlistData() {
+            // Fetch watchlist data from RabbitMQ and populate the watchlist.
+            // Use AJAX to get the user's watchlist data.
+            // Populate the elements with the received data.
+            const profileUsername = "<?php echo $profileUsername; ?>"; // Assuming $profileUsername is set somewhere before this script
+
+            $.ajax({
+                url: 'rabbitmq/populateWatchlist.php', // Replace with actual URL
+                method: 'GET',
+                dataType: 'json',
+                data: { username: profileUsername }, // Send the profile username to the backend
+                success: function (result) {
+                    // Process the received watchlist data and generate the components.
+                    if (result && result.length > 0) {
+                        result.forEach(function (item) {
+                            const movieTitle = item.movie_title;
+                            const dateAdded = item.date_added;
+                            const movieImageSrc = item.movie_image; // Assuming this is the URL to the movie image.
+                            const isCurrentUserWatchlist = item.username === profileUsername;
+
+                            // Generate the watchlist component and append it to the container.
+                            const watchlistComponent = `
+                                <div class="watchlist-item">
+                                    <a href="movie.html">${movieTitle}</a>
+                                    <p>Date Added: ${dateAdded}</p>
+                                    <img src="${movieImageSrc}" alt="${movieTitle} Image">
+                                    ${isCurrentUserWatchlist ? '<button class="remove-button">Remove</button>' : ''}
+                                </div>
+                            `;
+
+                            $('#watchlist-container').append(watchlistComponent);
+
+                            // If this is the user's watchlist, add click event to the remove button.
+                            if (isCurrentUserWatchlist) {
+                                $('.remove-button').click(function() {
+                                    // Handle the removal of the movie from the watchlist.
+                                    const movieToRemove = $(this).siblings('a').text(); // Get the movie title.
+                                    removeMovieFromWatchlist(movieToRemove);
+                                });
+                            }
+                        });
+                    } else {
+                        // Handle case where watchlist is empty.
+                        $('#watchlist-container').append('<p>No movies in watchlist</p>');
+                    }
+                },
+                error: function () {
+                    console.log("Error loading watchlist data");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
+

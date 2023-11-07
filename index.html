@@ -6,6 +6,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>    
+    <div id="navbar-container"></div> <!-- This is where the navbar will be loaded -->
+    
     <div id="failure"></div>
 
     <div>
@@ -23,44 +25,57 @@
             </table>
             <button type="button" onclick="validate()" name="submit" id="submit">Submit</button>
         </form>
-        <p>Don't have an account? <a href="register.html">Register here</a>.</p>
+        <p>Don't have an account? <a href="register.php">Register here</a>.</p>
     </div>
     <script>
-        function validate() {
-            let formData = new FormData($("#login")[0]);
-            formData.append("type", "login");
-            let uname = formData.get("username");
-            console.log("Logging in");
-    
-            $.ajax({
-                url: 'userValidate.php',
-                method: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                dataType: 'json',
-                success: function(result) {
-                    console.log(result);
-    
-                    if (result.returnCode == "1") {
-                        console.log("Login successful");
-                        document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
-                        document.cookie = "username=" + uname;
-                        console.log("Redirecting to home.html");
-                        location.href = "home.html";
+        // Load the navbar component
+        const navbarContainer = document.getElementById('navbar-container');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'navbar.html', true);
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            navbarContainer.innerHTML = xhr.responseText;
+
+            // Continue with your existing JavaScript code
+            function validate() {
+                let formData = new FormData($("#login")[0]);
+                formData.append("type", "login");
+                let uname = formData.get("username");
+                console.log("Logging in");
+        
+                $.ajax({
+                    url: 'userValidate.php',
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(result) {
+                        console.log(result);
+        
+                        if (result.returnCode == "1") {
+                            console.log("Login successful");
+                            document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
+                            document.cookie = "username=" + uname;
+                            console.log("Redirecting to home.html");
+                            location.href = "home.html";
+                        }
+        
+                        showMessage(result.message);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        showMessage(errorThrown);
                     }
-    
-                    showMessage(result.message);
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    showMessage(errorThrown);
-                }
-            });
-        }
-    
-        function showMessage(message) {
-            $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
-        }
+                });
+            }
+        
+            function showMessage(message) {
+                $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
+            }
+          }
+        };
+        xhr.send();
     </script>    
 </body>
 </html>

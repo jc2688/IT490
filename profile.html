@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About username</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="styles.css"> <!-- Include your CSS file -->
+</head>
+<body>
+    <div id="navbar-container"></div>
+    
+    <h1>About username</h1>
+
+    <div id="director">
+        <h2>Favorite Director</h2>
+        <p id="director-info"></p>
+        <button id="edit-director">Edit</button>
+    </div>
+
+    <div id="genre">
+        <h2>Favorite Genre</h2>
+        <p id="genre-info"></p>
+        <button id="edit-genre">Edit</button>
+    </div>
+
+    <div id="bio">
+        <h2>Bio</h2>
+        <p id="bio-info"></p>
+        <button id="edit-bio">Edit</button>
+    </div>
+
+    <script>
+        // Load the navbar component
+        const navbarContainer = document.getElementById('navbar-container');
+    
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'navbar.html', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                navbarContainer.innerHTML = xhr.responseText;
+    
+                // Call other functions after the navbar is loaded (if needed)
+                loadProfileData();
+    
+                // Check if it's the user's own profile page to enable edit functionality
+                const isOwnProfile = isCurrentUserProfile(); // Function to check if it's the user's own profile
+                if (isOwnProfile) {
+                    enableEditFunctionality();
+                }
+            }
+        };
+        xhr.send();
+    
+        function isCurrentUserProfile() {
+             const currentSessionUsername = "<?php echo $_SESSION['username']; ?>"; 
+             const profileUsername = "<?php echo isset($_GET['username']) ? $_GET['username'] : $_SESSION['username']; ?>"; 
+             return currentSessionUsername === profileUsername;
+        }
+    
+        function loadProfileData() {
+            // Fetch data from your backend (PHP) and populate the respective sections.
+            // Use AJAX to get the user's favorite director, genre, and bio.
+            // Populate the elements with the received data.
+            $.ajax({
+                url: 'RabbitMQ/getProfileData.php', // Replace with actual URL
+                method: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.director) {
+                        $('#director-info').text(result.director);
+                    }
+                    if (result.genre) {
+                        $('#genre-info').text(result.genre);
+                    }
+                    if (result.bio) {
+                        $('#bio-info').text(result.bio);
+                    }
+                },
+                error: function () {
+                    console.log("Error loading profile data");
+                }
+            });
+        }
+    
+        function editField(field) {
+            const newValue = prompt(`Enter new value for ${field}:`);
+            if (newValue !== null) {
+                // Send the new value to RabbitMQ for processing
+                sendMessageToRabbitMQ(field, newValue);
+            }
+        }
+    
+        function sendMessageToRabbitMQ(field, value) {
+            // Send the message to RabbitMQ.
+            $.ajax({
+                url: 'RabbitMQ/updateProfile.php', // Replace with actual URL
+                method: 'POST',
+                data: { field: field, value: value },
+                success: function () {
+                    // Handle success (optional)
+                    console.log(`Message sent: ${field} - ${value}`);
+                },
+                error: function () {
+                    console.log("Error sending message to RabbitMQ");
+                }
+            });
+        }
+    
+        function enableEditFunctionality() {
+            $('#edit-director').prop('disabled', false);
+            $('#edit-genre').prop('disabled', false);
+            $('#edit-bio').prop('disabled', false);
+        }
+    
+        $('#edit-director').click(function () {
+            editField('director');
+        });
+    
+        $('#edit-genre').click(function () {
+            editField('genre');
+        });
+    
+        $('#edit-bio').click(function () {
+            editField('bio');
+        });
+    </script>
+    
+    
+</body>
+</html>
