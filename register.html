@@ -55,6 +55,8 @@
             <button type="submit" name="submit" id="submit">Submit</button>
         </form>
     </div>
+
+    <p>Already have an account? <a href="index.html">Login Here</a>.</p>
     
     <script>
         let form = $("#register");
@@ -69,7 +71,7 @@
 
             try {
                 let response = await $.ajax({
-                    url: 'userRegistration.php',
+                    url: 'RabbitMQ/userRegistration.php',
                     method: "POST",
                     data: formData,
                     processData: false,
