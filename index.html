@@ -6,8 +6,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>    
-    <div id="navbar-container"></div> <!-- This is where the navbar will be loaded -->
-    
     <div id="failure"></div>
 
     <div>
@@ -29,57 +27,45 @@
     </div>
     <script>
         $(document).ready(function() {
-            // Load the navbar component
-            const navbarContainer = document.getElementById('navbar-container');
+            // Define the validate function in the global scope
+            function validate() {
+                let formData = new FormData($("#login")[0]);
+                formData.append("type", "login");
+                let uname = formData.get("username");
+                console.log("Logging in");
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', '/components/navbar.html', true); // Update the URL to point to the correct location
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    navbarContainer.innerHTML = xhr.responseText;
+                $.ajax({
+                    url: 'RabbitMQ/userValidate.php',
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(result) {
+                        console.log(result);
 
-                    // Define the validate function in the global scope
-                    function validate() {
-                        let formData = new FormData($("#login")[0]);
-                        formData.append("type", "login");
-                        let uname = formData.get("username");
-                        console.log("Logging in");
+                        if (result.returnCode == "1") {
+                            console.log("Login successful");
+                            document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
+                            document.cookie = "username=" + uname;
+                            console.log("Redirecting to home.html");
+                            location.href = "home.html";
+                        }
 
-                        $.ajax({
-                            url: 'userValidate.php',
-                            method: "POST",
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            dataType: 'json',
-                            success: function(result) {
-                                console.log(result);
-
-                                if (result.returnCode == "1") {
-                                    console.log("Login successful");
-                                    document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
-                                    document.cookie = "username=" + uname;
-                                    console.log("Redirecting to home.html");
-                                    location.href = "home.html";
-                                }
-
-                                showMessage(result.message);
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                showMessage(errorThrown);
-                            }
-                        });
+                        showMessage(result.message);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        showMessage(errorThrown);
                     }
+                });
+            }
 
-                    function showMessage(message) {
-                        $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
-                    }
+            function showMessage(message) {
+                $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
+            }
 
-                    // Assign the validate function to the button click event
-                    $('#submit').click(validate);
-                }
-            };
-            xhr.send();
+            // Assign the validate function to the button click event
+            $('#submit').click(validate);
         });
     </script>    
 </body>

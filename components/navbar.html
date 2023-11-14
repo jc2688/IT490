@@ -1,28 +1,33 @@
-<nav>
-  <div class="logo">
-    <a href="home.php"><img src="path_to_your_logo_image.png" alt="Logo"></a>
-  </div>
-  <ul class="nav-links">
-    <!-- Add PHP code directly into the HTML file -->
-    <?php
-      session_start();
-      if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-        // User is logged in
-        echo '<li><a href="#">New Page 1</a></li>';
-        echo '<li><a href="#">New Page 2</a></li>';
-        echo '<li class="profile-dropdown">';
-        echo   '<a href="#">Profile</a>';
-        echo   '<ul class="dropdown-content">';
-        echo     '<li><a href="#">Edit Profile</a></li>';
-        echo     '<li><a href="logout.php">Log Out</a></li>'; // Assuming you have a logout.php file for logging out
-        echo   '</ul>';
-        echo '</li>';
-      } else {
-        // User is not logged in
-        echo '<li><a href="login.php">Login</a></li>';
-        echo '<li><a href="register.php">Register</a></li>';
-      }
-    ?>
-  </ul>
-</nav>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Website</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include your CSS file here -->
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="home.php"><img src="path_to_your_logo_image.png" alt="Logo"></a>
+        </div>
+        <ul class="nav-links">
+            <li class="profile-dropdown">
+                <a href="#" id="profile-link">Profile</a>
+                <ul class="dropdown-content">
+                    <li><a href="#">Edit Profile</a></li>
+                    <li><a href="logout.php">Log Out</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const profileLink = document.getElementById("profile-link");
+            profileLink.href = "profile.html?username=" + encodeURIComponent("<?php echo isset($_SESSION['username']) ? $_SESSION['username'] : ''; ?>");
+        });
+    </script>
+</body>
+</html>
 
