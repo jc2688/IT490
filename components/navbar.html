@@ -1,6 +1,6 @@
 <nav>
   <div class="logo">
-    <a href="home.php"><img src="path_to_your_logo_image.png" alt="Logo"></a>
+    <a href="home.html"><img src="path_to_your_logo_image.png" alt="Logo"></a>
   </div>
   <ul class="nav-links">
     <!-- Add PHP code directly into the HTML file -->
@@ -8,7 +8,7 @@
       session_start();
       if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         // User is logged in
-        echo '<li><a href="#">New Page 1</a></li>';
+        echo '<li><a href="searchMovies.html">search movies</a></li>';
         echo '<li><a href="#">New Page 2</a></li>';
         echo '<li class="profile-dropdown">';
         echo   '<a href="#">Profile</a>';
