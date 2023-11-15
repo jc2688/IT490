@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Search</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <h1>Movie Search</h1>
+
+    <div>
+        <label for="search-bar">Search for movies:</label>
+        <input type="text" id="search-bar" placeholder="Enter movie title">
+        <button id="search-button">Search</button>
+    </div>
+
+    <div id="search-results">
+        <!-- Display search results here -->
+    </div>
+
+    <script>
+        // Load the navbar component
+        const navbarContainer = document.getElementById('navbar-container');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'components/navbar.html', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                navbarContainer.innerHTML = xhr.responseText;
+
+                // Add event listener for the search button
+                $('#search-button').click(function () {
+                    const searchTerm = $('#search-bar').val();
+                    if (searchTerm.trim() !== '') {
+                        searchMovies(searchTerm);
+                    } else {
+                        // Handle empty search term
+                        $('#search-results').html('<p>Please enter a movie title to search.</p>');
+                    }
+                });
+            }
+        };
+        xhr.send();
+
+        function searchMovies(searchTerm) {
+            // Send the search term to 'searchMovie.php'
+            $.ajax({
+                url: 'RabbitMQ/searchMovie.php', // Replace with actual URL
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    type: 'searchMovies', // Update to match the expected type in apiConsumer
+                    query: searchTerm // Rename to match the expected parameter in apiConsumer
+                },
+                success: function (response) {
+                    // Display search results
+                    displaySearchResults(response.movieData); // Adjust to match the structure of the response
+                },
+                error: function () {
+                    console.log("Error searching for movies");
+                }
+            });
+        }
+
+        function displaySearchResults(results) {
+            const resultsContainer = $('#search-results');
+            resultsContainer.empty();
+
+            if (results.length === 0) {
+                resultsContainer.html('<p>No results found.</p>');
+            } else {
+                // Iterate through the results and display them
+                results.forEach(function (result) {
+                    const movieLink = $('<a>')
+                        .attr('href', 'movie_page.php?title=' + encodeURIComponent(result.title))
+                        .text(result.title);
+
+                    resultsContainer.append($('<div>').append(movieLink));
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -13,14 +13,14 @@
         echo '<li class="profile-dropdown">';
         echo   '<a href="#">Profile</a>';
         echo   '<ul class="dropdown-content">';
-        echo     '<li><a href="#">Edit Profile</a></li>';
+        echo     '<li><a href="profile.html">Edit Profile</a></li>';
         echo     '<li><a href="logout.php">Log Out</a></li>'; // Assuming you have a logout.php file for logging out
         echo   '</ul>';
         echo '</li>';
       } else {
         // User is not logged in
-        echo '<li><a href="login.php">Login</a></li>';
-        echo '<li><a href="register.php">Register</a></li>';
+        echo '<li><a href="index.html">Login</a></li>';
+        echo '<li><a href="register.html">Register</a></li>';
       }
     ?>
   </ul>

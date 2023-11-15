@@ -83,78 +83,23 @@
         }
 
         function loadRecommendations() {
-            $.ajax({
-                url: 'RabbitMQ/getRecommendations.php',
-                method: 'GET',
-                dataType: 'json',
-                success: function (result) {
-                    if (result.length > 0) {
-                        let recommendationsContainer = document.getElementById("recommendations");
-
-                        result.forEach(movie => {
-                            let movieContainer = document.createElement('div');
-                            movieContainer.classList.add('movie');
-
-                            let titleElement = document.createElement('h2');
-                            titleElement.innerHTML = `<a href="movieDetails.php?id=${movie.id}">${movie.title}</a>`;
-
-                            let ratingElement = document.createElement('p');
-                            ratingElement.textContent = `Rating: ${movie.rating}`;
-                            let reviewElement = document.createElement('p');
-                            reviewElement.textContent = movie.review;
-
-                            movieContainer.appendChild(titleElement);
-                            movieContainer.appendChild(ratingElement);
-                            movieContainer.appendChild(reviewElement);
-
-                            let reviewsContainer = document.createElement('div');
-                            reviewsContainer.classList.add('reviews');
-
-                            $.ajax({
-                                url: 'RabbitMQ/getReviews.php',
-                                method: 'GET',
-                                data: { movieTitle: movie.title },
-                                dataType: 'json',
-                                success: function (reviews) {
-                                    if (reviews.length > 0) {
-                                        reviews.forEach(review => {
-                                            let reviewContainer = document.createElement('div');
-                                            reviewContainer.classList.add('review');
-
-                                            let blurbElement = document.createElement('p');
-                                            blurbElement.textContent = `Blurb: ${review.blurb}`;
-                                            let scoreElement = document.createElement('p');
-                                            scoreElement.textContent = `Score: ${review.score}`;
-                                            let usernameElement = document.createElement('p');
-                                            usernameElement.textContent = `Username: ${review.username}`;
-
-                                            reviewContainer.appendChild(blurbElement);
-                                            reviewContainer.appendChild(scoreElement);
-                                            reviewContainer.appendChild(usernameElement);
-
-                                            reviewsContainer.appendChild(reviewContainer);
-                                        });
-                                    } else {
-                                        let noReviewsElement = document.createElement('p');
-                                        noReviewsElement.textContent = 'No reviews available.';
-                                        reviewsContainer.appendChild(noReviewsElement);
-                                    }
-                                },
-                                error: function () {
-                                    console.log(`Error loading reviews for ${movie.title}`);
-                                }
-                            });
-
-                            movieContainer.appendChild(reviewsContainer);
-                            recommendationsContainer.appendChild(movieContainer);
-                        });
-                    }
-                },
-                error: function () {
-                    console.log("Error loading recommendations");
-                }
-            });
-        }
+        $.ajax({
+            url: 'path/to/your/apiConsumer.php', // Replace with the actual URL
+            method: 'POST', // Change to POST since we are sending data
+            dataType: 'json',
+            data: {
+                type: 'displayRecommendedMovies', // Update to match the expected type in apiConsumer
+                movieData: 'YOUR_MOVIE_DATA_VALUE', // Replace with the actual movie data
+                source: 'YOUR_SOURCE_VALUE' // Replace with the actual source data
+            },
+            success: function (result) {
+                // Handle the success response if needed
+            },
+            error: function () {
+                console.log("Error loading recommendations");
+            }
+        });
+    }
 
         setWelcomeMessage();
     </script>

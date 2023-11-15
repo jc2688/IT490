@@ -6,7 +6,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>    
-    <div id="navbar-container"></div> <!-- This is where the navbar will be loaded -->
+    <!-- Removed the navbar container -->
     
     <div id="failure"></div>
 
@@ -23,63 +23,53 @@
                     <td><input type="password" id="password" name="password" size="16" required></td>
                 </tr>
             </table>
-            <button type="button" id="submit">Submit</button> <!-- Removed the 'onclick' attribute -->
+            <button type="button" id="submit">Submit</button>
         </form>
         <p>Don't have an account? <a href="register.php">Register here</a>.</p>
     </div>
     <script>
         $(document).ready(function() {
-            // Load the navbar component
-            const navbarContainer = document.getElementById('navbar-container');
+            // Removed the code that loads and inserts the navbar HTML
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', '/components/navbar.html', true); // Update the URL to point to the correct location
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    navbarContainer.innerHTML = xhr.responseText;
+            // Define the validate function in the global scope
+            function validate() {
+                let formData = new FormData($("#login")[0]);
+                formData.append("type", "login");
+                let uname = formData.get("username");
+                console.log("Logging in");
 
-                    // Define the validate function in the global scope
-                    function validate() {
-                        let formData = new FormData($("#login")[0]);
-                        formData.append("type", "login");
-                        let uname = formData.get("username");
-                        console.log("Logging in");
+                $.ajax({
+                    url: 'RabbitMQ/userValidate.php',
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(result) {
+                        console.log(result);
 
-                        $.ajax({
-                            url: 'RabbitMQ/userValidate.php',
-                            method: "POST",
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            dataType: 'json',
-                            success: function(result) {
-                                console.log(result);
+                        if (result.returnCode == "1") {
+                            console.log("Login successful");
+                            document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
+                            document.cookie = "username=" + uname;
+                            console.log("Redirecting to home.html");
+                            location.href = "home.html";
+                        }
 
-                                if (result.returnCode == "1") {
-                                    console.log("Login successful");
-                                    document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
-                                    document.cookie = "username=" + uname;
-                                    console.log("Redirecting to home.html");
-                                    location.href = "home.html";
-                                }
-
-                                showMessage(result.message);
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                showMessage(errorThrown);
-                            }
-                        });
+                        showMessage(result.message);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        showMessage(errorThrown);
                     }
+                });
+            }
 
-                    function showMessage(message) {
-                        $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
-                    }
+            function showMessage(message) {
+                $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
+            }
 
-                    // Assign the validate function to the button click event
-                    $('#submit').click(validate);
-                }
-            };
-            xhr.send();
+            // Assign the validate function to the button click event
+            $('#submit').click(validate);
         });
     </script>    
 </body>

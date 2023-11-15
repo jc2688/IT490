@@ -41,6 +41,12 @@
     
                 // Call other functions after the navbar is loaded (if needed)
                 loadProfileData();
+
+                // Event listener for the "Profile" link in the navbar
+                $('#profile-link').click(function (event) {
+                    event.preventDefault(); // Prevent the default link behavior
+                    loadProfileData("<?php echo $_SESSION['username']; ?>");
+                });
     
                 // Check if it's the user's own profile page to enable edit functionality
                 const isOwnProfile = isCurrentUserProfile(); // Function to check if it's the user's own profile
@@ -57,13 +63,14 @@
              return currentSessionUsername === profileUsername;
         }
     
-        function loadProfileData() {
+        function loadProfileData(username) {
             // Fetch data from your backend (PHP) and populate the respective sections.
             // Use AJAX to get the user's favorite director, genre, and bio.
             // Populate the elements with the received data.
             $.ajax({
                 url: 'RabbitMQ/getProfileData.php', // Replace with actual URL
                 method: 'GET',
+                data: { username: username }, // Pass the username as a parameter
                 dataType: 'json',
                 success: function (result) {
                     if (result.director) {
@@ -93,15 +100,21 @@
         function sendMessageToRabbitMQ(field, value) {
             // Send the message to RabbitMQ.
             $.ajax({
-                url: 'RabbitMQ/updateProfile.php', // Replace with actual URL
-                method: 'POST',
-                data: { field: field, value: value },
+                url: 'RabbitMQ/apiConsumer.php', // Replace with the actual URL
+                method: 'POST', // Change to POST since we are sending data
+                data: {
+                    type: 'updateUserPreferences', // Update to match the expected type in apiConsumer
+                    userID: 'YOUR_USER_ID_VALUE', // Replace with the actual user ID
+                    preferences: { [field]: value } // Pass the field and value as an object
+                },
                 success: function () {
                     // Handle success (optional)
-                    console.log(`Message sent: ${field} - ${value}`);
+                    console.log(`Preferences updated: ${field} - ${value}`);
+                    // You may want to reload the profile data after updating preferences
+                    loadProfileData("<?php echo $_SESSION['username']; ?>");
                 },
                 error: function () {
-                    console.log("Error sending message to RabbitMQ");
+                    console.log("Error updating preferences");
                 }
             });
         }
@@ -124,7 +137,5 @@
             editField('bio');
         });
     </script>
-    
-    
 </body>
 </html>
