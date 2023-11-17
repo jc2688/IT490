@@ -10,7 +10,7 @@
 
     <div>
         <form id="login">
-            <h4>Log In server 1</h4>
+            <h4>Log In</h4>
             <table>
                 <tr>
                     <th>Username:</th>
@@ -21,52 +21,46 @@
                     <td><input type="password" id="password" name="password" size="16" required></td>
                 </tr>
             </table>
-            <button type="button" id="submit">Submit</button>
+            <button type="button" onclick="validate()" name="submit" id="submit">Submit</button>
         </form>
         <p>Don't have an account? <a href="register.html">Register here</a>.</p>
     </div>
     <script>
-        $(document).ready(function() {
-            function validate() {
-                let formData = new FormData($("#login")[0]);
-                formData.append("type", "login");
-                console.log("Logging in");
-
-                $.ajax({
-                    url: 'RabbitMQ/userValidate.php',
-                    method: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json',
-                    success: function(result) {
-                        console.log(result);
-
-                        if (result.returnCode == "1") {
-                            console.log("Login successful");
-                            let uname = formData.get("username");
-                            uname = uname.toLowerCase(); // Convert username to lowercase
-
-                            document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
-                            document.cookie = "username=" + encodeURIComponent(uname) + ";path='/';SameSite=Lax;";
-                            console.log("Redirecting to home.html");
-                            location.href = "home.html";
-                        }
-
-                        showMessage(result.message);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        showMessage(errorThrown);
+        function validate() {
+            let formData = new FormData($("#login")[0]);
+            formData.append("type", "login");
+            let uname = formData.get("username");
+            console.log("Logging in");
+    
+            $.ajax({
+                url: 'userValidate.php',
+                method: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(result) {
+                    console.log(result);
+    
+                    if (result.returnCode == "1") {
+                        console.log("Login successful");
+                        document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
+                        document.cookie = "username=" + uname;
+                        console.log("Redirecting to home.html");
+                        location.href = "home.html";
                     }
-                });
-            }
-
-            function showMessage(message) {
-                $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
-            }
-
-            $('#submit').click(validate);
-        });
+    
+                    showMessage(result.message);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    showMessage(errorThrown);
+                }
+            });
+        }
+    
+        function showMessage(message) {
+            $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
+        }
     </script>    
 </body>
 </html>
