@@ -11,22 +11,44 @@
     
     <h1>About username</h1>
 
+    <div id="username">
+        <h2>Username</h2>
+        <p id="username-info"></p>
+    </div>
+
+    <div id="actor">
+        <h2>Favorite Actor</h2>
+        <p id="actor-info"></p>
+        <button id="edit-actor" style="display: none;">Edit</button>
+    </div>
+
+    <div id="movie">
+        <h2>Favorite Movie</h2>
+        <p id="movie-info"></p>
+        <button id="edit-movie" style="display: none;">Edit</button>
+    </div>
+
     <div id="director">
         <h2>Favorite Director</h2>
         <p id="director-info"></p>
-        <button id="edit-director">Edit</button>
+        <button id="edit-director" style="display: none;">Edit</button>
     </div>
 
     <div id="genre">
         <h2>Favorite Genre</h2>
         <p id="genre-info"></p>
-        <button id="edit-genre">Edit</button>
+        <button id="edit-genre" style="display: none;">Edit</button>
+    </div>
+
+    <div id="rate">
+        <h2>Rate Score</h2>
+        <p id="rate-info"></p>
     </div>
 
     <div id="bio">
         <h2>Bio</h2>
         <p id="bio-info"></p>
-        <button id="edit-bio">Edit</button>
+        <button id="edit-bio" style="display: none;">Edit</button>
     </div>
 
     <script>
@@ -41,7 +63,7 @@
     
                 // Call other functions after the navbar is loaded (if needed)
                 loadProfileData();
-
+    
                 // Event listener for the "Profile" link in the navbar
                 $('#profile-link').click(function (event) {
                     event.preventDefault(); // Prevent the default link behavior
@@ -58,29 +80,46 @@
         xhr.send();
     
         function isCurrentUserProfile() {
-             const currentSessionUsername = "<?php echo $_SESSION['username']; ?>"; 
-             const profileUsername = "<?php echo isset($_GET['username']) ? $_GET['username'] : $_SESSION['username']; ?>"; 
-             return currentSessionUsername === profileUsername;
+            const currentSessionUsername = "<?php echo $_SESSION['username']; ?>";
+            const profileUsername = "<?php echo isset($_GET['username']) ? $_GET['username'] : $_SESSION['username']; ?>";
+            return currentSessionUsername === profileUsername;
         }
     
         function loadProfileData(username) {
-            // Fetch data from your backend (PHP) and populate the respective sections.
-            // Use AJAX to get the user's favorite director, genre, and bio.
+            // Fetch data from our backend (PHP) and populate the respective sections. NEEDS TO BE CHANGED FOR ACTUAL FUNCTIONS
+            // Use AJAX to get the user's favorite director, movie, and bio.
             // Populate the elements with the received data.
             $.ajax({
-                url: 'RabbitMQ/getProfileData.php', // Replace with actual URL
+                url: 'RabbitMQ/getProfileData.php', // Replace with actual file and command 
                 method: 'GET',
                 data: { username: username }, // Pass the username as a parameter
                 dataType: 'json',
                 success: function (result) {
+                    if (result.username) {
+                        $('#username-info').text(result.username);
+                    }
+                    if (result.actor) {
+                        $('#actor-info').text(result.actor);
+                        $('#edit-actor').show();
+                    }
+                    if (result.movie) {
+                        $('#movie-info').text(result.movie);
+                        $('#edit-movie').show();
+                    }
                     if (result.director) {
                         $('#director-info').text(result.director);
+                        $('#edit-director').show();
                     }
                     if (result.genre) {
                         $('#genre-info').text(result.genre);
+                        $('#edit-genre').show();
+                    }
+                    if (result.rate) {
+                        $('#rate-info').text(result.rate);
                     }
                     if (result.bio) {
                         $('#bio-info').text(result.bio);
+                        $('#edit-bio').show();
                     }
                 },
                 error: function () {
@@ -89,53 +128,44 @@
             });
         }
     
-        function editField(field) {
-            const newValue = prompt(`Enter new value for ${field}:`);
-            if (newValue !== null) {
-                // Send the new value to RabbitMQ for processing
-                sendMessageToRabbitMQ(field, newValue);
-            }
-        }
+        // Add edit functionality here
     
-        function sendMessageToRabbitMQ(field, value) {
-            // Send the message to RabbitMQ.
-            $.ajax({
-                url: 'RabbitMQ/apiConsumer.php', // Replace with the actual URL
-                method: 'POST', // Change to POST since we are sending data
-                data: {
-                    type: 'updateUserPreferences', // Update to match the expected type in apiConsumer
-                    userID: 'YOUR_USER_ID_VALUE', // Replace with the actual user ID
-                    preferences: { [field]: value } // Pass the field and value as an object
-                },
-                success: function () {
-                    // Handle success (optional)
-                    console.log(`Preferences updated: ${field} - ${value}`);
-                    // You may want to reload the profile data after updating preferences
-                    loadProfileData("<?php echo $_SESSION['username']; ?>");
-                },
-                error: function () {
-                    console.log("Error updating preferences");
-                }
+        function enableEditFunctionality() {
+            $('#edit-actor').show();
+            $('#edit-movie').show();
+            $('#edit-director').show();
+            $('#edit-genre').show();
+            $('#edit-bio').show();
+    
+            $('#edit-actor').click(function () {
+                // Logic to enable editing favorite actor information
+                // (show input field, submit button, etc.)
+            });
+    
+            $('#edit-movie').click(function () {
+                // Logic to enable editing favorite movie information
+                // (show input field, submit button, etc.)
+            });
+    
+            $('#edit-director').click(function () {
+                // Logic to enable editing favorite director information
+                // (show input field, submit button, etc.)
+            });
+    
+            $('#edit-genre').click(function () {
+                // Logic to enable editing favorite genre information
+                // (show input field, submit button, etc.)
+            });
+    
+            $('#edit-bio').click(function () {
+                // Logic to enable editing biography information
+                // (show input field, submit button, etc.)
             });
         }
     
-        function enableEditFunctionality() {
-            $('#edit-director').prop('disabled', false);
-            $('#edit-genre').prop('disabled', false);
-            $('#edit-bio').prop('disabled', false);
-        }
-    
-        $('#edit-director').click(function () {
-            editField('director');
-        });
-    
-        $('#edit-genre').click(function () {
-            editField('genre');
-        });
-    
-        $('#edit-bio').click(function () {
-            editField('bio');
-        });
+        // Rest of my functions...
     </script>
+    
 </body>
 </html>
+    

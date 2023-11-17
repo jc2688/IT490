@@ -52,7 +52,8 @@
                     <td><input type="password" id="password" name="password" size="16" required></td>
                 </tr>
             </table>
-            <button type="submit" name="submit" id="submit">Submit</button>
+            <!-- Changed the button name from 'Submit' to 'Text' -->
+            <button type="submit" name="next" id="next">Next</button>
         </form>
     </div>
     
@@ -91,7 +92,9 @@
                         showMessage(response.message, response.returnCode == "1" ? "success" : "error");
 
                         if (response.returnCode == "1") {
-                            location.href = "index.html";
+                            // Set session variable and redirect to newProfile page
+                            sessionStorage.setItem('profileUser', $('#username').val());
+                            window.location.href = "newProfile.html"; // Change to the newProfile page
                         }
                     } catch (error) {
                         showMessage(error.message, "error");
