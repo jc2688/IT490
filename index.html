@@ -6,8 +6,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>    
-    <!-- Removed the navbar container -->
-    
     <div id="failure"></div>
 
     <div>
@@ -29,13 +27,9 @@
     </div>
     <script>
         $(document).ready(function() {
-            // Removed the code that loads and inserts the navbar HTML
-
-            // Define the validate function in the global scope
             function validate() {
                 let formData = new FormData($("#login")[0]);
                 formData.append("type", "login");
-                let uname = formData.get("username");
                 console.log("Logging in");
 
                 $.ajax({
@@ -50,8 +44,11 @@
 
                         if (result.returnCode == "1") {
                             console.log("Login successful");
+                            let uname = formData.get("username");
+                            uname = uname.toLowerCase(); // Convert username to lowercase
+
                             document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
-                            document.cookie = "username=" + uname;
+                            document.cookie = "username=" + encodeURIComponent(uname) + ";path='/';SameSite=Lax;";
                             console.log("Redirecting to home.html");
                             location.href = "home.html";
                         }
@@ -68,7 +65,6 @@
                 $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
             }
 
-            // Assign the validate function to the button click event
             $('#submit').click(validate);
         });
     </script>    
