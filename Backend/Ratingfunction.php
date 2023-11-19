@@ -1,11 +1,7 @@
 <?php
 
 function getLeaderboard() {
-    // Database connection details
-    $servername = "your_db_server";
-    $username = "your_db_username";
-    $password = "your_db_password";
-    $dbname = "your_db_name";
+  
 
     
     $conn = new mysqli($servername, $username, $password, $dbname);
