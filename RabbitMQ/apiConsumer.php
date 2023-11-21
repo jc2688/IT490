@@ -1,7 +1,7 @@
 <?php
-require_once(__DIR__ . 'path.inc');
-require_once(__DIR__ . 'get_host_info.inc');
-require_once(__DIR__ . 'rabbitMQLib.inc');
+require_once(__DIR__ . '/path.inc');
+require_once(__DIR__ . '/get_host_info.inc');
+require_once(__DIR__ . '/rabbitMQLib.inc');
 
 if ($_POST) {
   $request = array();
@@ -20,6 +20,25 @@ if ($_POST) {
   } elseif ($request['type'] === "updateUserPreferences") {
     $request['userID'] = $_POST['userID'];
     $request['preferences'] = $_POST['preferences'];
+
+  } elseif ($request['type'] === "searchMoviesAndTVShows") {
+    $request['query'] = $_POST['query'];
+
+  } elseif ($request['type'] === "searchPerson") {
+    $request['personName'] = $_POST['personName'];
+
+  } elseif ($request['type'] === "recommendationActorDirector") {
+    $request['username'] = $_POST['username'];
+
+  } elseif ($request['type'] === "getMoviesByActor") {
+    $request['actorName'] = $_POST['actorName'];
+
+  } elseif ($request['type'] === "getMoviesByDirector") {
+    $request['directorName'] = $_POST['directorName'];
+
+  } elseif ($request['type'] === "getMoviesByMovieAndGenre") {
+    $request['username'] = $_POST['username'];
+
   } else {
     echo json_encode(["error" => "Invalid request type"]);
     exit;

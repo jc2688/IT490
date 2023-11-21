@@ -1,7 +1,9 @@
 <?php
 require_once('dbConnection.inc');
 require_once('rabbitFunctions.inc');
+require_once('SessionID.inc');
 
+//isfar
 function validateLogin($username, $password) {
     $database = dbConnect();
     $sanitizedUsername = $database->real_escape_string($username);
@@ -11,8 +13,6 @@ function validateLogin($username, $password) {
 
     while ($row = $result->fetch_assoc()) {
         if ($sanitizedPassword === $row["PasswordHash"]) {
-            
-            
                 return json_encode(array("returnCode" => '1', 'message' => "Logged In"));
             } else {
                 return json_encode(array("returnCode" => '0', 'message' => "Error with generating session"));
@@ -22,6 +22,7 @@ function validateLogin($username, $password) {
     return json_encode(array("returnCode" => '0', 'message' => "No User Match The Given Username"));
 }
 
+//isfar
 function validateRegister($firstname, $lastname, $username, $email, $address, $city, $country, $zipcode, $password) {
     $database = dbConnect();
     $sanitizedFirstname = $database->real_escape_string($firstname);
@@ -50,4 +51,345 @@ function validateRegister($firstname, $lastname, $username, $email, $address, $c
     }
     return json_encode(array("returnCode" => '0', 'message' => "Error with registering, try again"));
 }
-?>
+
+//isfar
+function validatePreferences($username, $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography) {
+    $accountID = getAccountIdByUsername($username);
+    if (!$accountID) {
+        return array('error' => 'Username not found.');
+    }
+    $mysqli = dbConnect();
+ //update sql   $query = "UPDATE Users SET FavoriteActor = ?, FavoriteDirector = ?, FavoriteMovie = ?, FavoriteGenre = ?, Biography = ? WHERE UserID = ?";
+    if ($stmt = $mysqli->prepare($query)) {
+        $stmt->bind_param("sssssi", $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography, $accountID);
+        if ($stmt->execute()) {
+            $stmt->close();
+            $mysqli->close();
+            return array('success' => 'User preferences updated successfully.');
+        } else {
+            $stmt->close();
+            $mysqli->close();
+            return array('error' => 'Error updating user preferences.');
+        }
+    }
+    return array('error' => 'Error updating user preferences.');
+}
+
+//isfar
+function getUserProfileData($username) {
+    $mysqli = dbConnect();
+    $accountID = getAccountIdByUsername($username);
+    if (!$accountID) {
+        return null;
+    }
+  //update sql statement to match  $query = "SELECT U.FavoriteDirector, U.FavoriteGenre, U.FavoriteMovie, U.FavoriteActor, U.Bio, R.MovieTitle, R.RateScore FROM Users U LEFT JOIN user_ratings R ON U.UserID = R.UserID WHERE U.UserID = ?";
+    if ($stmt = $mysqli->prepare($query)) {
+        $stmt->bind_param("i", $accountID);
+        $stmt->execute();
+        $stmt->bind_result($favoriteDirector, $favoriteGenre, $favoriteMovie, $favoriteActor, $bio, $rateScore);
+        $userData = [
+            "FavoriteDirector" => $favoriteDirector,
+            "FavoriteGenre" => $favoriteGenre,
+            "FavoriteMovie" => $favoriteMovie,
+            "FavoriteActor" => $favoriteActor,
+            "Bio" => $bio,
+        ];
+        while ($stmt->fetch()) {
+            $userData['RatedMovies'][] = [
+                'RateScore' => $rateScore,
+            ];
+        }
+        $stmt->close();
+        $mysqli->close();
+        return $userData;
+    }
+    return null;
+}
+
+//isfar
+function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
+    $mysqli = dbConnect(); 
+    $AccountID - getAccountID($username);
+    $sanitizedFavoriteActor = $database->real_escape_string($favActor);
+    $sanitizedFavoriteGenre = $database->real_escape_string($favGenre);
+    $sanitizedFavoriteDirector= $database->real_escape_string($favDirector);
+    $sanitizedFavoriteMovie = $database->real_escape_string($favMovie);
+    $sanitizedBiography= $database->real_escape_string($biography);
+    $updateQuery = "UPDATE Profiles SET FavoriteDirector = $sanitizedFavoriteDirector, FavoriteGenre = $sanitizedFavoriteGenre, FavoriteMovie = $sanitizedFavoriteMovie, FavoriteActor = $sanitizedFavoriteActor, Bio = $sanitizedBiography WHERE AccountID = $AccountID";
+    
+    if ($updateStmt = $mysqli->prepare($updateQuery)) {
+        $updateStmt->bind_param("ssssss", $data['FavoriteDirector'], $data['FavoriteGenre'], $data['FavoriteMovie'], $data['FavoriteActor'], $data['Bio'], $sessionID);
+        
+        if ($updateStmt->execute()) {
+            $updateStmt->close();
+            return ["status" => 200, "message" => "Settings updated successfully"];
+        }
+        
+        $updateStmt->close();
+    }
+
+    return ["status" => 500, "message" => "Failed to update settings"]; 
+}
+
+ $mysqli = dbConnect();
+    $mysqli->close(); 
+}
+
+//isfar
+function getWatchListData($username) {
+    $accountId = getAccountIdByUsername($username);
+    if (!$accountId) {
+        return array('error' => 'Username not found.');
+    }
+    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $watchListData = array();
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    } else {
+//change sql?        $sql = "SELECT MovieTitle, PosterURL, Year FROM WatchList WHERE AccountID = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $accountId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $watchListData[] = array(
+                'MovieTitle' => $row['MovieTitle'],
+                'PosterURL' => $row['PosterURL'],
+                'Year' => $row['Year'],
+            );
+        }
+        $stmt->close();
+        $conn->close();
+    }
+    return $watchListData;
+}
+
+//isfar
+function getWatchedListData($username) {
+    $accountId = getAccountIdByUsername($username);
+    if (!$accountId) {
+        return array('error' => 'Username not found.');
+    }
+    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $watchedListData = array();
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    } else {
+ //update sql/       $sql = "SELECT MovieTitle, PosterURL, Year FROM WatchedList WHERE AccountID = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $accountId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $watchedListData[] = array(
+                'MovieTitle' => $row['MovieTitle'],
+                'PosterURL' => $row['PosterURL'],
+                'Year' => $row['Year'],
+            );
+        }
+        $stmt->close();
+        $conn->close();
+    }
+    return $watchedListData;
+}
+
+//isfar
+function addToWatchList($username, $movieTitle, $posterURL, $year) {
+    $accountId = getAccountIdByUsername($username);
+    if (!$accountId) {
+        return array('success' => false, 'message' => 'Username not found.');
+    }
+    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $status = [];
+    if ($conn->connect_error) {
+        $status['success'] = false;
+        $status['message'] = "Connection failed: " . $conn->connect_error;
+    } else {
+  //update sql      $sql = "INSERT INTO WatchList (AccountID, MovieTitle, PosterURL, Year, TimeCreated, LastModified) VALUES (?, ?, ?, ?, NOW(), NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("isss", $accountId, $movieTitle, $posterURL, $year);
+        if ($stmt->execute()) {
+            $status['success'] = true;
+            $status['message'] = "Added successfully.";
+        } else {
+            $status['success'] = false;
+            $status['message'] = "Error: " . $stmt->error;
+        }
+        $stmt->close();
+    }
+    $conn->close();
+    sendStatusToRabbitMQ(json_encode($status));
+    return $status;
+}
+
+//isfar
+function addToWatchedList($username, $movieTitle, $posterURL, $year) {
+    $accountId = getAccountIdByUsername($username);
+    if (!$accountId) {
+        return array('success' => false, 'message' => 'Username not found.');
+    }
+    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $status = [];
+    if ($conn->connect_error) {
+        $status['success'] = false;
+        $status['message'] = "Connection failed: " . $conn->connect_error;
+    } else {
+ //change sql       $sql = "INSERT INTO WatchedList (AccountID, MovieTitle, PosterURL, Year, TimeCreated, LastModified) VALUES (?, ?, ?, ?, NOW(), NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("isss", $accountId, $movieTitle, $posterURL, $year);
+        if ($stmt->execute()) {
+            $status['success'] = true;
+            $status['message'] = "Added to watched list successfully.";
+        } else {
+            $status['success'] = false;
+            $status['message'] = "Error: " . $stmt->error;
+        }
+        $stmt->close();
+    }
+    $conn->close();
+    sendStatusToRabbitMQ(json_encode($status));
+    return $status;
+}
+
+//isfar
+function handlePostRequest() {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!empty($data) && isset($data['session_id'])) {
+        $sessionID = $data['session_id'];
+        $result = updateProfileSettings($sessionID, $data);
+        http_response_code($result['status']);
+        echo json_encode(["message" => $result['message']]);
+        exit;
+    }
+    echo "Invalid or missing data."; 
+}
+
+function handleInvalidRequestMethod() {
+    echo "Invalid request method."; 
+}
+
+function processRequest() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        handlePostRequest();
+    } else {
+        handleInvalidRequestMethod();
+    }
+
+    $mysqli = dbConnect();
+    $mysqli->close(); 
+}
+
+//isfar
+function addUserBioToDatabase($userId, $userBio) {
+ $accountID = getAccountIdByUsername($username);
+    if (!$accountID) {
+        return null;
+    }
+    $conn = new mysqli(10.244.1.2, 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    $userId = $conn->real_escape_string($userId);
+    $userBio = $conn->real_escape_string($userBio);
+   // update sql statement $sql = "UPDATE users SET bio = '$userBio' WHERE id = '$userId'";
+    if ($conn->query($sql) === TRUE) {
+        echo "User bio added successfully";
+    } else {
+        echo "Error updating user bio: " . $conn->error;
+    }
+    $conn->close();
+}
+
+//isfar
+function updateUserProfile($username, $favoriteActor, $favoriteMovie, $favoriteDirector, $favoriteGenres, $biography) {
+    $mysqli = dbConnect();
+    $accountID = getAccountIdByUsername($username);
+    if (!$accountID) {
+        return false;
+}
+  //update statement  $query = " UPDATE Users SET FavoriteActor = ?, FavoriteMovie = ?, FavoriteDirector = ?, FavoriteGenres = ?, Biography = ? WHERE UserID = ? ";
+    if ($stmt = $mysqli->prepare($query)) {
+        $stmt->bind_param("sssssi", $favoriteActor, $favoriteMovie, $favoriteDirector, $favoriteGenres, $biography, $accountID);
+        if ($stmt->execute()) {
+            $stmt->close();
+            $mysqli->close();
+            return true;
+        } else {
+            $stmt->close();
+            $mysqli->close();
+            return false; 
+        }
+    }
+    return false;
+}
+
+//isfar
+function getAccountIdByUsername($username) {
+    $conn = new mysqli(10.244.1.2, 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    $username = $conn->real_escape_string($username);
+ //update sql statement to match   $sql = "SELECT id FROM users WHERE username = '$username'";
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $accountId = $row['id'];
+        $conn->close();
+        return $accountId;
+    } else {
+        $conn->close();
+        return false; // Username not found
+    }
+}
+$connection = new mysqli($servername, $username, $password, $dbname);
+
+if ($connection->connect_error) {
+    die("Connection failed: " . $connection->connect_error);
+}
+
+function calculateRateScoreAndLeaderboard($connection) {
+    $query = "SELECT Profiles.RateScore, Profiles.AccountID, Accounts.Username 
+              FROM Profiles 
+              CROSS JOIN Accounts 
+              WHERE Accounts.AccountID = Profiles.AccountID 
+              ORDER BY RateScore DESC 
+              LIMIT 0, 10";
+    
+    $result = mysqli_query($connection, $query);
+    if (!$result) {
+        die('Error in query: ' . mysqli_error($connection));
+    }
+    $leaderboard = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $leaderboard[] = $row;
+    }
+    mysqli_free_result($result);
+    return $leaderboard;
+}
+
+//isfar ==== unique identifier for movie?
+/*
+function deleteFromWatchList($watchListID) {
+    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $status = [];
+    if ($conn->connect_error) {
+        $status['success'] = false;
+        $status['message'] = "Connection failed: " . $conn->connect_error;
+    } else {
+        $sql = "DELETE FROM WatchList WHERE WatchListID = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $watchListID);
+        if ($stmt->execute()) {
+            $status['success'] = true;
+            $status['message'] = "Deleted successfully from WatchList.";
+        } else {
+            $status['success'] = false;
+            $status['message'] = "Error: " . $stmt->error;
+        }
+        $stmt->close();
+        $conn->close();
+    }
+    return $status;
+}
+*/
