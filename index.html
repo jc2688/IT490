@@ -33,7 +33,7 @@
             console.log("Logging in");
     
             $.ajax({
-                url: 'RabbitMQ/userValidate.php',
+                url: 'RabbitMQ/dbConsumer.php', // Change the URL to point to dbConsumer
                 method: "POST",
                 data: formData,
                 processData: false,
@@ -61,6 +61,6 @@
         function showMessage(message) {
             $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
         }
-    </script>    
+    </script>
 </body>
 </html>

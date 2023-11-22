@@ -57,6 +57,7 @@
         </form>
     </div>
     
+        <!-- Your HTML and script tags remain the same, only the script inside them is updated -->
     <script>
         // Load the navbar component
         const navbarContainer = document.getElementById('navbar-container');
@@ -75,12 +76,12 @@
                     event.preventDefault();
 
                     let formData = new FormData(form[0]);
-                    formData.append("type", "register");
+                    formData.append("type", "register"); // Setting the "type" parameter to "register"
                     console.log("Trying registration");
 
                     try {
                         let response = await $.ajax({
-                            url: 'RabbitMQ/userRegistration.php',
+                            url: 'RabbitMQ/dbConsumer.php', // Update to point to dbConsumer.php
                             method: "POST",
                             data: formData,
                             processData: false,

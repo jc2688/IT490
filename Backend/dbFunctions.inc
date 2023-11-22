@@ -109,7 +109,7 @@ function getUserProfileData($username) {
 //isfar
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
     $mysqli = dbConnect(); 
-    $AccountID - getAccountID($username);
+    $AccountID = getAccountID($username);
     $sanitizedFavoriteActor = $database->real_escape_string($favActor);
     $sanitizedFavoriteGenre = $database->real_escape_string($favGenre);
     $sanitizedFavoriteDirector= $database->real_escape_string($favDirector);

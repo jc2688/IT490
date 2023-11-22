@@ -48,12 +48,12 @@
         function searchMovies(searchTerm) {
             // Send the search term to 'searchMovie.php'
             $.ajax({
-                url: 'RabbitMQ/searchMovie.php', // Replace with actual URL
+                url: 'RabbitMQ/apiConsumer.php', // Replace with actual URL
                 method: 'POST',
                 dataType: 'json',
                 data: {
-                    type: 'searchMovies', // Update to match the expected type in apiConsumer
-                    query: searchTerm // Rename to match the expected parameter in apiConsumer
+                    type: 'searchMoviesAndTVShows', // Update to match the expected type in apiConsumer
+                    query: searchQuery // Rename to match the expected parameter in apiConsumer
                 },
                 success: function (response) {
                     // Display search results
