@@ -1,28 +1,43 @@
-<nav>
-  <div class="logo">
-    <a href="home.html"><img src="path_to_your_logo_image.png" alt="Logo"></a>
-  </div>
-  <ul class="nav-links">
-    <!-- Add PHP code directly into the HTML file -->
-    <?php
-      session_start();
-      if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-        // User is logged in
-        echo '<li><a href="searchMovies.html">search movies</a></li>';
-        echo '<li><a href="#">New Page 2</a></li>';
-        echo '<li class="profile-dropdown">';
-        echo   '<a href="#">Profile</a>';
-        echo   '<ul class="dropdown-content">';
-        echo     '<li><a href="profile.html">Edit Profile</a></li>';
-        echo     '<li><a href="logout.php">Log Out</a></li>'; // Assuming you have a logout.php file for logging out
-        echo   '</ul>';
-        echo '</li>';
-      } else {
-        // User is not logged in
-        echo '<li><a href="index.html">Login</a></li>';
-        echo '<li><a href="register.html">Register</a></li>';
-      }
-    ?>
-  </ul>
-</nav>
+<div class="search-bar">
+  <input type="text" placeholder="Search for movies Here!" id="search-input">
+  <button onclick="searchMovies()">Search</button>
+  <div id="search-results"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  function searchMovies() {
+      let query = $('#search-input').val();
+
+      $.ajax({
+          url: 'RabbitMQ/apiConsumer.php',
+          method: 'POST',
+          data: {
+              type: 'searchMoviesAndTVShows',
+              query: query
+          },
+          dataType: 'json',
+          success: function(response) {
+              console.log(response); // Example: Logging the response to the console
+              displaySearchResults(response);
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+              console.error(errorThrown);
+              // Handle errors here
+          }
+      });
+  }
+
+  function displaySearchResults(results) {
+      let searchResults = $('#search-results');
+      searchResults.empty(); // Clear previous search results
+      
+      results.forEach(function(result) {
+          let link = $('<a></a>').attr('href', `movie_page.php?title=${encodeURIComponent(result.Title)}`).text(result.Title);
+          searchResults.append(link);
+          searchResults.append('<br>');
+      });
+  }
+</script>
+
 

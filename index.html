@@ -1,9 +1,22 @@
+<?php
+session_start();
+
+// Check if the user is already logged in
+if (isset($_SESSION['loggedInUser'])) {
+    // User is logged in, redirect to home.html
+    header("Location: home.html");
+    exit();
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <title>Login</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
 </head>
 <body>    
     <div id="failure"></div>
@@ -30,8 +43,16 @@
             let formData = new FormData($("#login")[0]);
             formData.append("type", "login");
             let uname = formData.get("username");
+            let password = formData.get("password");
+            
             console.log("Logging in");
-    
+            
+            // Hash the password (for demonstration purposes, using SHA-256)
+            let hashedPassword = sha256(password); // Use appropriate hashing for production
+            
+            // Add the hashed password to the form data
+            formData.set("password", hashedPassword);
+
             $.ajax({
                 url: 'RabbitMQ/dbConsumer.php', // Change the URL to point to dbConsumer
                 method: "POST",
@@ -44,13 +65,33 @@
     
                     if (result.returnCode == "1") {
                         console.log("Login successful");
-                        document.cookie = "sessionid=" + encodeURIComponent(result.sessionid) + ";path='/';SameSite=Lax;";
-                        document.cookie = "username=" + uname;
-                        console.log("Redirecting to home.html");
-                        location.href = "home.html";
+                        // Make another AJAX call to set the session
+                        $.ajax({
+                            url: 'setSession.php', // Replace with the path to setSession.php
+                            method: 'POST',
+                            data: {
+                                type: 'login',
+                                successFromRabbitMQ: 'true',
+                                username: uname // Assuming uname holds the username
+                                // Include other necessary data if needed
+                            },
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.status === 'success') {
+                                    console.log('Session set for logged-in user');
+                                    // Redirect to home.html after session is set
+                                    location.href = 'home.html';
+                                } else {
+                                    showMessage('Failed to set session');
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                showMessage(errorThrown);
+                            }
+                        });
+                    } else {
+                        showMessage(result.message);
                     }
-    
-                    showMessage(result.message);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     showMessage(errorThrown);

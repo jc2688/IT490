@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recommendations</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="navbar-container"></div>
+
+    <h1>Recommendations</h1>
+
+    <div id="recommendations-container"></div>
+
+    <script>
+        $(document).ready(function() {
+            // Load the navbar component
+            const navbarContainer = document.getElementById('navbar-container');
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'components/navbar.html', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    navbarContainer.innerHTML = xhr.responseText;
+                    loadRecommendations();
+                }
+            };
+            xhr.send();
+        });
+
+        function loadRecommendations() {
+            // Fetch recommendations based on the user's preferences stored in sessions
+            $.ajax({
+                url: 'apiConsumer.php', // Endpoint to fetch recommendations
+                method: 'POST',
+                data: {
+                    type: 'displayRecommendedMovies',
+                    loggedInUser: '<?php echo $_SESSION["loggedInUser"]; ?>' // Get the logged-in user from sessions
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response && response.recommendations) {
+                        displayRecommendations(response.recommendations);
+                    } else {
+                        console.log('No recommendations found');
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error(errorThrown);
+                    // Handle errors if any
+                }
+            });
+        }
+
+        function displayRecommendations(recommendations) {
+            const recommendationsContainer = document.getElementById('recommendations-container');
+
+            // Loop through the recommendations and create movie blocks
+            recommendations.forEach(movie => {
+                const movieBlock = document.createElement('div');
+                movieBlock.classList.add('movie-block');
+                movieBlock.innerHTML = `
+                    <h2>${movie.Title}</h2>
+                    <p>Type: ${movie.Type}</p>
+                    <img src="${movie.PosterURL}" alt="${movie.Title} Poster">
+                    <!-- Add additional movie information here -->
+                `;
+                // Append each movie block to the recommendations container
+                recommendationsContainer.appendChild(movieBlock);
+            });
+        }
+    </script>
+</body>
+</html>

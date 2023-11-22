@@ -1,0 +1,31 @@
+<div class="search-bar">
+    <input type="text" id="search-input" placeholder="Search for movies Here!" class="search-input">
+    <button onclick="searchMovies()">Search</button>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function searchMovies() {
+        let query = $('#search-input').val();
+
+        // Make an AJAX request to your APIConsumer
+        $.ajax({
+            url: 'RabbitMQ/apiConsumer.php',
+            method: 'POST',
+            data: {
+                type: 'searchMoviesAndTVShows',
+                query: query
+            },
+            dataType: 'json',
+            success: function(response) {
+                // Handle the API response here and display the results as needed
+                console.log(response); // Example: Logging the response to the console
+                // Update your UI with the search results
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error(errorThrown);
+                // Handle errors here
+            }
+        });
+    }
+</script>
