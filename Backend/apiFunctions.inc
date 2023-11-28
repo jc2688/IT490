@@ -222,4 +222,58 @@ function getMoviesByDetails($movieId, $apiKey) {
     }
 }
 
+
+
+//isfar
+function getRecentWatchedRecommendations($username, $apiKey) {
+    $accountId = getAccountIdByUsername($username);
+    if (!$accountId) {
+        return array('error' => 'Username not found.');
+    }
+    $mostRecentWatched = getMostRecentWatched($username);
+    if (!$mostRecentWatched) {
+        return getPopularRecommendations($apiKey);
+    }
+    $recentTitle = $mostRecentWatched['MovieTitle'];
+    $recentPosterPath = $mostRecentWatched['PosterURL'];
+    $recommendations = searchMoviesByTitle($recentTitle, $apiKey);
+    $recommendations += getPopularRecommendations($apiKey, 10 - count($recommendations));
+    return $recommendations;
+}
+
+//isfar
+function getMostRecentWatched($username) {
+    global $apiKey;
+    $accountId = getAccountIdByUsername($username);
+    if (!$accountId) {
+        return array('error' => 'Username not found.');
+    }
+    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+ //update   $sql = "SELECT MovieTitle, PosterURL, Year
+            FROM WatchedList
+            WHERE AccountID = ?
+            ORDER BY WatchedDate DESC
+            LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $accountId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $mostRecentWatched = array(
+            'MovieTitle' => $row['MovieTitle'],
+            'PosterURL' => $row['PosterURL'],
+            'Year' => $row['Year'],
+        );
+    } else {
+        $mostRecentWatched = null;
+    }
+    $stmt->close();
+    $conn->close();
+    return $mostRecentWatched;
+}
+
+
 ?>
