@@ -65,7 +65,6 @@ if ($_POST) {
             break;
 
         case "getLeaderboard":
-            // No additional parameters required for this case
             break;
 
         default:
