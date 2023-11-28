@@ -50,6 +50,10 @@ function requestProcessor($request){
       echo "Getting movies by movie and genre";
       return getMoviesByMovieAndGenre($request['username']);
 
+    case "getMovieBDetails":
+      echo "Getting details for movie";
+      return getMovieBDetails($request['movieID']);
+
     default:
       echo "Request type not handled";
       return ["error" => "Request type not supported"];
