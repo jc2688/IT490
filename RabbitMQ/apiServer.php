@@ -9,21 +9,9 @@ function requestProcessor($request){
   echo "received request" . PHP_EOL;
   var_dump($request);
   switch ($request['type']) {
-    case "displayRecommendedMovies":
-      echo "Displaying recommended movies";
-      return displayRecommendedMovies($request['movieData'], $request['source']);
-
     case "searchMovies":
       echo "Searching for movies";
       return searchMoviesAndTVShows($request['query']);
-
-    case "fetchUserProfile":
-      echo "Fetching user profile";
-      return fetchUserProfile($request['sessionID']);
-
-    case "updateUserPreferences":
-      echo "Updating user preferences";
-      return updateUserPreferences($request['userID'], $request['preferences']);
 
     case "searchMoviesAndTVShows":
       echo "Searching for tv shows and movies";
@@ -49,7 +37,7 @@ function requestProcessor($request){
       echo "Getting movies by movie and genre";
       return getMoviesByMovieAndGenre($request['username']);
 
-    case "getMovieBDetails":
+    case "getMoviesByDetails":
       echo "Getting details for movie";
       return getMovieBDetails($request['movieID']);
 

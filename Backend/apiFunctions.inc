@@ -175,7 +175,7 @@ function getAccountIdByUsername($username) {
     }
 }
 
-function getMoviesBDetails($movieId, $apiKey) {
+function getMoviesByDetails($movieId, $apiKey) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/movie/{$movieId}?api_key={$apiKey}";
     $response = file_get_contents($apiUrl);
