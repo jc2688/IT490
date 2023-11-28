@@ -1,7 +1,6 @@
 <?php
 require_once('dbConnection.inc');
-require_once('rabbitFunctions.inc');
-require_once('SessionID.inc');
+
 $apiKey = 'ab0f6b84bbcbbd4066f4fee3eaba248c';
 
 function searchMoviesandTVShows($query, $apiKey) {
