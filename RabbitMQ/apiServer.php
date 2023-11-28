@@ -39,7 +39,7 @@ function requestProcessor($request){
 
     case "getMoviesByDetails":
       echo "Getting details for movie";
-      return getMovieBDetails($request['movieID']);
+      return getMoviesByDetails($request['movieID']);
 
     default:
       echo "Request type not handled";

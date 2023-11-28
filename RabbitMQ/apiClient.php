@@ -46,7 +46,7 @@ if ($_POST) {
             $request['username'] = $_POST['username'];
             break;
 
-        case "getMovieBDetails":
+        case "getMovieByDetails":
             $request['movieID'] = $_POST['movieID'];
             break;
 
