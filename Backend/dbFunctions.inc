@@ -346,8 +346,7 @@ if ($connection->connect_error) {
     return $leaderboard;
 }
 }
-//isfar ==== unique identifier for movie?
-/*
+
 function deleteFromWatchList($watchListID) {
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
     $status = [];
@@ -370,7 +369,6 @@ function deleteFromWatchList($watchListID) {
     }
     return $status;
 }
-*/
 
 /**
  * Inserts a user review into the database
@@ -417,10 +415,4 @@ function searchRatingsByMovie($movieTitle){
     http_response_code(200);
     return json_encode(["returnCode" => '1', "reviews" => $result]);
 }
-
-
-
-
-
-
 ?>
