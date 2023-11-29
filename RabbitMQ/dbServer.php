@@ -21,6 +21,10 @@ function requestProcessor($request) {
             echo "registering now";
             return validateRegister($request['firstname'], $request['lastname'], $request['username'], $request['email'], $request['address'], $request['city'], $request['country'], $request['zipcode'], $request['password']);
 
+        case "validatePreferences":
+            echo "validating preferences";
+            return validatePreferences($request['username'], $request['favoriteActor'], $request['favoriteDirector'], $request['favoriteMovie'], $request['favoriteGenre'], $request['biography']);
+        
         case "getUserProfile":
             echo "getting user profile";
             return getUserProfileData($request['username']);
@@ -45,6 +49,10 @@ function requestProcessor($request) {
             echo "adding to watched list";
             return addToWatchedList($request['username'], $request['movieTitle'], $request['posterURL'], $request['year']);
         
+        case "updateUserProfile":
+            echo "updating user profile";
+            return updateUserProfile($request['username'], $request['favoriteActor'], $request['favoriteMovie'], $request['favoriteDirector'], $request['favoriteGenres'], $request['biography']);
+
         case "searchMovieReviews":
             echo "searching movie reviews";
             return searchRatingsByMovie($request['movieTitle']);

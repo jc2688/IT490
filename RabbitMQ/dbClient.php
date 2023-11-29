@@ -30,9 +30,11 @@ if ($_POST) {
         case "getWatchedList":
             $request['username'] = $_POST['username'];
             break;
-
+        
+        case "updateUserProfile":
         case "updateProfile":
         case "updatePreferences":
+        case "validateUserPreferences":
             $request['username'] = $_POST['username'];
             $request['favActor'] = $_POST['favActor'];
             $request['favGenre'] = $_POST['favGenre'];
