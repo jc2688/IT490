@@ -253,10 +253,10 @@ function getMostRecentWatched($username) {
         die("Connection failed: " . $conn->connect_error);
     }
  //update   $sql = "SELECT MovieTitle, PosterURL, Year
-            FROM WatchedList
-            WHERE AccountID = ?
-            ORDER BY WatchedDate DESC
-            LIMIT 1";
+//            FROM WatchedList
+//            WHERE AccountID = ?
+//            ORDER BY WatchedDate DESC
+//            LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $accountId);
     $stmt->execute();
