@@ -16,47 +16,47 @@ function requestProcessor($request){
   switch ($request['type']) {
     // Handle search movies request
     case "searchMovies":
-      echo "Searching for movies";
+      echo "Searching for movies\n";
       return searchMoviesAndTVShows($request['query']);
 
     // Handle search movies and TV shows request
-    case "searchMoviesAndTVShows":
+    case "searchMoviesAndTVShows\n":
       echo "Searching for tv shows and movies";
       return searchMoviesandTVShows($request['query']);
 
     // Handle search person request
     case "searchPerson":
-      echo "Searching for a person";
+      echo "Searching for a person\n";
       return searchPerson($request['personName']);
 
     // Handle recommendation for actor or director request
     case "recommendationActorDirector":
-      echo "Getting recommendations based on actor and director";
+      echo "Getting recommendations based on actor and director\n";
       return recommendationActorDirector($request['username']);
 
     // Handle get movies by actor request
     case "getMoviesByActor":
-      echo "Getting movies by actor";
+      echo "Getting movies by actor\n";
       return getMoviesByActor($request['actorName']);
 
     // Handle get movies by director request
     case "getMoviesByDirector":
-      echo "Getting movies by director";
+      echo "Getting movies by director\n";
       return getMoviesByDirector($request['directorName']);
 
     // Handle get movies by movie and genre request
     case "getMoviesByMovieAndGenre":
-      echo "Getting movies by movie and genre";
+      echo "Getting movies by movie and genre\n";
       return getMoviesByMovieAndGenre($request['username']);
 
     // Handle get movie by details request
     case "getMoviesByDetails":
-      echo "Getting details for movie";
+      echo "Getting details for movie\n";
       return getMoviesByDetails($request['movieID']);
 
     // Default case for unhandled request types
     default:
-      echo "Request type not handled";
+      echo "Request type not handled\n";
       return ["error" => "Request type not supported"];
   }
 }
