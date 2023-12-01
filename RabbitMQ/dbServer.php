@@ -1,84 +1,106 @@
 #!/usr/bin/php
 <?php
-require_once('../Backend/dbConnection.inc');
+// Include required files for RabbitMQ connection and database-related functions
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
 require_once('../Backend/dbFunctions.inc');
 
+// Function to process incoming requests
 function requestProcessor($request) {
-    $response = '';
-    echo "received request" . PHP_EOL;
+      // Print a message indicating the request received and show request details
+    echo "received request" . PHP_EOL; 
     var_dump($request);
 
-    if (!isset($request['type'])) {
-        return "ERROR: unsupported message type";
-    }
-
+    // Switch case to handle different types of requests based on the 'type' field
     switch ($request['type']) {
+        // Handle login request
         case "login":
             echo "logging in";
             return validateLogin($request['username'], $request['password']);
 
+        // Handle user registration request
         case "register":
             echo "registering now";
             return validateRegister($request['firstname'], $request['lastname'], $request['username'], $request['email'], $request['address'], $request['city'], $request['country'], $request['zipcode'], $request['password']);
 
+        // Handle validation of user preferences
         case "validatePreferences":
             echo "validating preferences";
             return validatePreferences($request['username'], $request['favoriteActor'], $request['favoriteDirector'], $request['favoriteMovie'], $request['favoriteGenre'], $request['biography']);
         
+        // Handle request to get user profile
         case "getUserProfile":
             echo "getting user profile";
             return getUserProfileData($request['username']);
 
+        // Handle request to update user profile
         case "updateProfile":
             echo "updating profile settings";
             return updateProfileSettings($request['username'], $request['favActor'], $request['favGenre'], $request['favDirector'], $request['favMovie'], $request['biography']);
 
+        // Handle request to get user's watch list
         case "getWatchList":
             echo "getting watch list data";
             return getWatchListData($request['username']);
 
+        // Handle request to get user's watched list
         case "getWatchedList":
             echo "getting watched list data";
             return getWatchedListData($request['username']);
 
+        // Handle adding a movie to the watch list
         case "addToWatchList":
             echo "adding to watch list";
             return addToWatchList($request['username'], $request['movieTitle'], $request['posterURL'], $request['year']);
 
+        // Handle adding a movie to the watched list
         case "addToWatchedList":
             echo "adding to watched list";
             return addToWatchedList($request['username'], $request['movieTitle'], $request['posterURL'], $request['year']);
         
+        // Handle updating the user profile
         case "updateUserProfile":
             echo "updating user profile";
             return updateUserProfile($request['username'], $request['favoriteActor'], $request['favoriteMovie'], $request['favoriteDirector'], $request['favoriteGenres'], $request['biography']);
 
+        // Handle search for movie reviews
         case "searchMovieReviews":
             echo "searching movie reviews";
             return searchRatingsByMovie($request['movieTitle']);
 
+        // Handle updating user preferences
         case "updatePreferences":
             echo "updating user preferences";
             return validatePreferences($request['username'], $request['favoriteActor'], $request['favoriteDirector'], $request['favoriteMovie'], $request['favoriteGenre'], $request['biography']);
 
+        // Handle request for leaderboard data
         case "getLeaderboard":
             echo "getting leaderboard";
             return calculateRateScoreAndLeaderboard();
 
+        // Handle insertion of a movie review
         case "insertReview":
             echo "inserting review";
             return insertReview($request['accountId'], $request['movieTitle'], $request['rating'], $request['review']);
 
+        // Handle deletion of a movie from the watch list
         case "deleteFromWatchList":
             echo "deleting from watch list";
             return deleteFromWatchList($request['watchListID']);
+        
+        // Default case for unhandled request types
+        default:
+            echo "Request type not handled";
+            return ["error" => "Request type not supported"];
     }
-
-    return json_encode(array("returnCode" => '0', 'message' => "Server message received but type not defined"));
 }
 
+// Create a new RabbitMQServer class instance with specified configuration for database access
 $server = new rabbitMQServer("testRabbitMQ.ini", "database");
-echo "db server started" . PHP_EOL;
-$server->process_requests('requestProcessor');
+
+echo "db server started up" . PHP_EOL; // Message indicating the server has started
+$server->process_requests('requestProcessor'); // Process incoming requests using the defined request processor function
+echo "db server shut down" . PHP_EOL; // Message indicating the server is shutting down
 exit();
 ?>
