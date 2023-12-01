@@ -57,7 +57,7 @@ function validatePreferences($username, $favoriteActor, $favoriteDirector, $favo
         return array('error' => 'Username not found.');
     }
     $mysqli = dbConnect();
- //update sql   $query = "UPDATE Users SET FavoriteActor = ?, FavoriteDirector = ?, FavoriteMovie = ?, FavoriteGenre = ?, Biography = ? WHERE UserID = ?";
+ //updateD! sql   $query = "UPDATE Profiles SET FavoriteActor = $favoriteActor, FavoriteDirector = $favoriteDirector, FavoriteMovie = $favoriteMovie, FavoriteGenres = $favoriteGenre, Biography = $biography WHERE AccountID = $accountId";
     if ($stmt = $mysqli->prepare($query)) {
         $stmt->bind_param("sssssi", $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography, $accountID);
         if ($stmt->execute()) {
@@ -80,17 +80,18 @@ function getUserProfileData($username) {
     if (!$accountID) {
         return null;
     }
-  //update sql statement to match  $query = "SELECT U.FavoriteDirector, U.FavoriteGenre, U.FavoriteMovie, U.FavoriteActor, U.Bio, R.MovieTitle, R.RateScore FROM Users U LEFT JOIN user_ratings R ON U.UserID = R.UserID WHERE U.UserID = ?";
+  //updated! sql statement to match  $query = "SELECT FavoriteDirector, FavoriteGenres, FavoriteMovie, FavoriteActor, Bio, RateScore FROM Profiles WHERE AccountID = $accountID";
     if ($stmt = $mysqli->prepare($query)) {
         $stmt->bind_param("i", $accountID);
         $stmt->execute();
         $stmt->bind_result($favoriteDirector, $favoriteGenre, $favoriteMovie, $favoriteActor, $bio, $rateScore);
         $userData = [
             "FavoriteDirector" => $favoriteDirector,
-            "FavoriteGenre" => $favoriteGenre,
+            "FavoriteGenres" => $favoriteGenre,
             "FavoriteMovie" => $favoriteMovie,
             "FavoriteActor" => $favoriteActor,
-            "Bio" => $bio,
+            "Biography" => $bio,
+            
         ];
         while ($stmt->fetch()) {
             $userData['RatedMovies'][] = [
@@ -380,7 +381,7 @@ function deleteFromWatchList($watchListID) {
 function insertReview($accountId, $movieTitle, $rating, $review){
     // CREATE TABLE Rating(AccountID INT UNSIGNED NOT NULL, movieTitle VARCHAR(255) NOT NULL, Rating TINYINT UNSIGNED NOT NULL, Review TEXT NOT NULL);
     $connection = dbConnect();
-    $stmt = $connection->prepare("INSERT INTO Rating(AccountID, movieTitle, Rating, Review) VALUES(?, ?, ?, ?)");
+    $stmt = $connection->prepare("INSERT INTO Ratings(AccountID, Movie, Rating, Review) VALUES($accountId, $movieTitle, $rating, $review)");
     $stmt->bind_param("dsds", $accountId, $movieTitle, $rating, $review);
     $stmt->execute();
     $succeeded = $stmt->errno === 0;
@@ -398,7 +399,7 @@ function insertReview($accountId, $movieTitle, $rating, $review){
 function searchRatingsByMovie($movieTitle){
     $result = [];
     $connection = dbConnect();
-    $stmt = $connection->prepare("SELECT AccountID, movieTitle, Rating, Review FROM Rating WHERE movieTitle=?");
+    $stmt = $connection->prepare("SELECT AccountID, Movie, Rating, Review FROM Rating WHERE Movie=$movieTitkle");
     $stmt->bind_param("s", $movieTitle);
     $stmt->execute();
     $stmt->bind_result($accountId, $movieTitle, $rating, $review);
