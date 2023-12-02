@@ -32,6 +32,13 @@
             let formData = new FormData($("#login")[0]);
             formData.append("type", "login");
             let uname = formData.get("username");
+            let password = formData.get("password");
+
+            // Hash the password using SHA-256
+            let hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+
+            formData.set("password", hashedPassword); // Update the password in the form data
+
             console.log("Logging in");
     
             $.ajax({
