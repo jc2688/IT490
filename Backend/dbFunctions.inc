@@ -4,23 +4,54 @@ require_once('dbConnection.inc');
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
-//isfar
+//isfar + Sean
 function validateLogin($username, $password) {
+    echo "Starting validation" . PHP_EOL;
+
     $database = dbConnect();
+    echo "Database connected" . PHP_EOL;
+
     $sanitizedUsername = $database->real_escape_string($username);
     $sanitizedPassword = $database->real_escape_string($password);
+
     $query = "SELECT * FROM Accounts WHERE Username = '$sanitizedUsername'";
+    echo "Executing query: $query" . PHP_EOL;
+
     $result = $database->query($query);
 
+    $usernameFound = false;
+    $startTime = microtime(true);
+
     while ($row = $result->fetch_assoc()) {
+        $usernameFound = true;
+
         if ($sanitizedPassword === $row["PasswordHash"]) {
-                return json_encode(array("returnCode" => '1', 'message' => "Logged In"));
-            } else {
-                return json_encode(array("returnCode" => '0', 'message' => "Error with generating session"));
+            echo "Password match found" . PHP_EOL;
+            return json_encode(array("returnCode" => '1', 'message' => "Logged In"));
+        } else {
+            // Check elapsed time
+            $elapsedTime = microtime(true) - $startTime;
+
+            // Set a time limit, e.g., 5 seconds
+            $timeLimit = 5;
+
+            if ($elapsedTime > $timeLimit) {
+                echo "Password check took too long" . PHP_EOL;
+                return json_encode(array("returnCode" => '0', 'message' => "Password check is taking too long"));
             }
-        
+
+            // Continue checking passwords
+            echo "Continuing password check" . PHP_EOL;
+        }
     }
-    return json_encode(array("returnCode" => '0', 'message' => "No User Match The Given Username"));
+
+    if ($usernameFound) {
+        echo "Incorrect Password" . PHP_EOL;
+        return json_encode(array("returnCode" => '0', 'message' => "Incorrect Password"));
+    } else {
+        echo "No User Match The Given Username" . PHP_EOL;
+        return json_encode(array("returnCode" => '0', 'message' => "No User Match The Given Username"));
+    }
 }
 
 //isfar
