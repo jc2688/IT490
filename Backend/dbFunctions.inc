@@ -114,7 +114,7 @@ function getUserProfileData($username) {
     if (!$accountID) {
         return null;
     }
-    sql statement to match  $query = "SELECT FavoriteDirector, FavoriteGenres, FavoriteMovie, FavoriteActor, Bio, RateScore FROM Profiles WHERE AccountID = $accountID";
+    $query = "SELECT FavoriteDirector, FavoriteGenres, FavoriteMovie, FavoriteActor, Bio, RateScore FROM Profiles WHERE AccountID = $accountID";
     if ($stmt = $mysqli->prepare($query)) {
         $stmt->bind_param("i", $accountID);
         $stmt->execute();
