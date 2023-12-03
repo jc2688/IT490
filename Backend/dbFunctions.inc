@@ -91,7 +91,7 @@ function validatePreferences($username, $favoriteActor, $favoriteDirector, $favo
         return array('error' => 'Username not found.');
     }
     $mysqli = dbConnect();
- //updateD! sql   $query = "UPDATE Profiles SET FavoriteActor = $favoriteActor, FavoriteDirector = $favoriteDirector, FavoriteMovie = $favoriteMovie, FavoriteGenres = $favoriteGenre, Biography = $biography WHERE AccountID = $accountId";
+    sql   $query = "UPDATE Profiles SET FavoriteActor = $favoriteActor, FavoriteDirector = $favoriteDirector, FavoriteMovie = $favoriteMovie, FavoriteGenres = $favoriteGenre, Biography = $biography WHERE AccountID = $accountId";
     if ($stmt = $mysqli->prepare($query)) {
         $stmt->bind_param("sssssi", $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography, $accountID);
         if ($stmt->execute()) {
@@ -114,7 +114,7 @@ function getUserProfileData($username) {
     if (!$accountID) {
         return null;
     }
-  //updated! sql statement to match  $query = "SELECT FavoriteDirector, FavoriteGenres, FavoriteMovie, FavoriteActor, Bio, RateScore FROM Profiles WHERE AccountID = $accountID";
+    sql statement to match  $query = "SELECT FavoriteDirector, FavoriteGenres, FavoriteMovie, FavoriteActor, Bio, RateScore FROM Profiles WHERE AccountID = $accountID";
     if ($stmt = $mysqli->prepare($query)) {
         $stmt->bind_param("i", $accountID);
         $stmt->execute();
