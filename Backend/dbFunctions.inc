@@ -444,13 +444,6 @@ function deleteFromWatchList($watchListID) {
     return $status;
 }
 
-/**
- * Inserts a user review into the database
- * @param int $accountId the account ID of the user who left the review
- * @param string $movieTitle the title of the movie
- * @param int $rating a rating (1-5) left by the user
- * @param string $review movie review left by the user
- */
 function insertReview($accountId, $movieTitle, $rating, $review){
     // CREATE TABLE Rating(AccountID INT UNSIGNED NOT NULL, movieTitle VARCHAR(255) NOT NULL, Rating TINYINT UNSIGNED NOT NULL, Review TEXT NOT NULL);
     $connection = dbConnect();
@@ -464,11 +457,6 @@ function insertReview($accountId, $movieTitle, $rating, $review){
     return json_encode(["returnCode" => $succeeded ? 1 : 0]);
 }
 
-/**
- * Searches ratings for a given movie title and returns a JSON array.
- * @param string $movieTitle the movie title to search ratings for
- * @return string
- */
 function searchRatingsByMovie($movieTitle){
     $result = [];
     $connection = dbConnect();
