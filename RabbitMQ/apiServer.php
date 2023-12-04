@@ -3,7 +3,7 @@
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
-require_once('../Backend/apiFunctions.inc'); // Ensure correct path
+require_once('../Backend/apiFunctions.inc');
 
 function requestProcessor($request){
   echo "received request" . PHP_EOL;
