@@ -140,7 +140,7 @@ function getUserProfileData($username) {
 }
 
 //isfar
-/*
+/* update sql user whenever
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
     $mysqli = dbConnect(); 
     $AccountID = getAccountID($username);
@@ -287,6 +287,47 @@ function addToWatchedList($username, $movieTitle, $posterURL, $year) {
 }
 
 //isfar
+function addToWatchedListAndRemoveFromWatchList($username, $movieTitle, $posterURL, $year) {
+    $accountId = getAccountIdByUsername($username);
+    if (!$accountId) {
+        return array('success' => false, 'message' => 'Username not found.');
+    }
+    $insertConn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+//update when made    $deleteConn = new mysqli('10.244.1.2', 'YourDeleteUser', 'YourDeleteUserPassword', 'SceneSync');
+    $status = [];
+    if ($insertConn->connect_error || $deleteConn->connect_error) {
+        $status['success'] = false;
+        $status['message'] = "Connection failed: " . $insertConn->connect_error . " | " . $deleteConn->connect_error;
+    } else {
+        $watchedSql = "INSERT INTO WatchedList (AccountID, Movie, PosterURL, Year, TimeWatched) VALUES (?, ?, ?, ?, NOW())";
+        $watchedStmt = $insertConn->prepare($watchedSql);
+        $watchedStmt->bind_param("isss", $accountId, $movieTitle, $posterURL, $year);
+        if ($watchedStmt->execute()) {
+            $status['success'] = true;
+            $status['message'] = "Added to Watched List successfully.";
+            $deleteSql = "DELETE FROM WatchList WHERE AccountID = ? AND Movie = ?";
+            $deleteStmt = $deleteConn->prepare($deleteSql);
+            $deleteStmt->bind_param("is", $accountId, $movieTitle);
+            if ($deleteStmt->execute()) {
+                $status['message'] .= " Deleted from Watch List successfully.";
+            } else {
+                $status['success'] = false;
+                $status['message'] = "Error deleting from Watch List: " . $deleteStmt->error;
+            }
+            $deleteStmt->close();
+        } else {
+            $status['success'] = false;
+            $status['message'] = "Error adding to Watched List: " . $watchedStmt->error;
+        }
+        $watchedStmt->close();
+    }
+    $insertConn->close();
+    $deleteConn->close();
+    sendStatusToRabbitMQ(json_encode($status));
+    return $status;
+}
+
+//isfar
 function handlePostRequest() {
     $data = json_decode(file_get_contents('php://input'), true);
     if (!empty($data) && isset($data['session_id'])) {
@@ -302,14 +343,12 @@ function handlePostRequest() {
 function handleInvalidRequestMethod() {
     echo "Invalid request method."; 
 }
-
 function processRequest() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         handlePostRequest();
     } else {
         handleInvalidRequestMethod();
     }
-
     $mysqli = dbConnect();
     $mysqli->close(); 
 }
@@ -405,13 +444,6 @@ function deleteFromWatchList($watchListID) {
     return $status;
 }
 
-/**
- * Inserts a user review into the database
- * @param int $accountId the account ID of the user who left the review
- * @param string $movieTitle the title of the movie
- * @param int $rating a rating (1-5) left by the user
- * @param string $review movie review left by the user
- */
 function insertReview($accountId, $movieTitle, $rating, $review){
     // CREATE TABLE Rating(AccountID INT UNSIGNED NOT NULL, movieTitle VARCHAR(255) NOT NULL, Rating TINYINT UNSIGNED NOT NULL, Review TEXT NOT NULL);
     $connection = dbConnect();
@@ -425,11 +457,6 @@ function insertReview($accountId, $movieTitle, $rating, $review){
     return json_encode(["returnCode" => $succeeded ? 1 : 0]);
 }
 
-/**
- * Searches ratings for a given movie title and returns a JSON array.
- * @param string $movieTitle the movie title to search ratings for
- * @return string
- */
 function searchRatingsByMovie($movieTitle){
     $result = [];
     $connection = dbConnect();
