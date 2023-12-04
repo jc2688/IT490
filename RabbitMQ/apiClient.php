@@ -73,7 +73,12 @@ if ($_POST) {
     // Create a new RabbitMQ client instance, send the request, and output the response
     $client = new rabbitMQClient("testRabbitMQ.ini", "api");
     $response = $client->send_request($request);
+    header("Content-Type: application/json");
     echo $response;
+
+    if (is_array($response)) {
+        $response = json_encode($response);
+    }
 
 } else {
     // Output an error message if no POST data is received
