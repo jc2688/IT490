@@ -140,7 +140,7 @@ function getUserProfileData($username) {
 }
 
 //isfar
-/*
+/* update sql user whenever
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
     $mysqli = dbConnect(); 
     $AccountID = getAccountID($username);
