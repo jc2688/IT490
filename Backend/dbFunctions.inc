@@ -140,9 +140,8 @@ function getUserProfileData($username) {
 }
 
 //isfar
-/* update sql user whenever
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
-    $mysqli = dbConnect(); 
+    $mysqli = dbConnect();
     $AccountID = getAccountID($username);
     $sanitizedFavoriteActor = $database->real_escape_string($favActor);
     $sanitizedFavoriteGenre = $database->real_escape_string($favGenre);
@@ -150,25 +149,19 @@ function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $f
     $sanitizedFavoriteMovie = $database->real_escape_string($favMovie);
     $sanitizedBiography= $database->real_escape_string($biography);
     $updateQuery = "UPDATE Profiles SET FavoriteDirector = $sanitizedFavoriteDirector, FavoriteGenre = $sanitizedFavoriteGenre, FavoriteMovie = $sanitizedFavoriteMovie, FavoriteActor = $sanitizedFavoriteActor, Bio = $sanitizedBiography WHERE AccountID = $AccountID";
-    
     if ($updateStmt = $mysqli->prepare($updateQuery)) {
         $updateStmt->bind_param("ssssss", $data['FavoriteDirector'], $data['FavoriteGenre'], $data['FavoriteMovie'], $data['FavoriteActor'], $data['Bio'], $sessionID);
-        
         if ($updateStmt->execute()) {
             $updateStmt->close();
             return ["status" => 200, "message" => "Settings updated successfully"];
         }
-        
         $updateStmt->close();
     }
-
     return ["status" => 500, "message" => "Failed to update settings"]; 
 }
-
  $mysqli = dbConnect();
     $mysqli->close(); 
 }
-*/
 
 //isfar
 function getWatchListData($username) {
@@ -293,7 +286,7 @@ function addToWatchedListAndRemoveFromWatchList($username, $movieTitle, $posterU
         return array('success' => false, 'message' => 'Username not found.');
     }
     $insertConn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
-//update when made    $deleteConn = new mysqli('10.244.1.2', 'YourDeleteUser', 'YourDeleteUserPassword', 'SceneSync');
+    $deleteConn = new mysqli('10.244.1.2', 'DeleteAccessOnly', 'cl3v3rm@ndoesTh1ngs!', 'SceneSync');
     $status = [];
     if ($insertConn->connect_error || $deleteConn->connect_error) {
         $status['success'] = false;
