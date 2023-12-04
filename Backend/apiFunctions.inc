@@ -3,7 +3,7 @@ require_once('dbConnection.inc');
 
 $apiKey = 'ab0f6b84bbcbbd4066f4fee3eaba248c';
 
-function searchMoviesandTVShows($query, $apiKey) {
+function searchMoviesandTVShows($query) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/search/multi?api_key={$apiKey}&query=" . urlencode($query);
     $response = file_get_contents($apiUrl);
@@ -23,7 +23,7 @@ function searchMoviesandTVShows($query, $apiKey) {
     }
 }
 
-function searchPerson($actorName, $apiKey) {
+function searchPerson($actorName) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($actorName);
     $response = file_get_contents($apiUrl);
@@ -57,8 +57,8 @@ function recommendationActorDirector($username) {
         $favoriteDirector = $row['FavoriteDirector'];
         $conn->close();
         global $apiKey;
-        $actorRecommendations = getMoviesByActor($favoriteActor, $apiKey);
-        $directorRecommendations = getMoviesByDirector($favoriteDirector, $apiKey);
+        $actorRecommendations = getMoviesByActor($favoriteActor);
+        $directorRecommendations = getMoviesByDirector($favoriteDirector);
         return array_merge($actorRecommendations, $directorRecommendations);
     } else {
         $conn->close();
@@ -66,7 +66,7 @@ function recommendationActorDirector($username) {
     }
 }
 
-function getMoviesByActor($favoriteActor, $apiKey) {
+function getMoviesByActor($favoriteActor) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($favoriteActor);
     $response = file_get_contents($apiUrl);
@@ -93,7 +93,7 @@ function getMoviesByActor($favoriteActor, $apiKey) {
     }
 }
 
-function getMoviesByDirector($favoriteDirector, $apiKey) {
+function getMoviesByDirector($favoriteDirector) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($favoriteDirector);
     $response = file_get_contents($apiUrl);
@@ -175,7 +175,7 @@ function getAccountIdByUsername($username) {
     }
 }
 
-function getMoviesByDetails($movieId, $apiKey) {
+function getMoviesByDetails($movieId) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/movie/{$movieId}?api_key={$apiKey}";
     $response = file_get_contents($apiUrl);
@@ -225,7 +225,7 @@ function getMoviesByDetails($movieId, $apiKey) {
 
 
 //isfar
-function getRecentWatchedRecommendations($username, $apiKey) {
+function getRecentWatchedRecommendations($username) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
         return array('error' => 'Username not found.');
@@ -236,7 +236,7 @@ function getRecentWatchedRecommendations($username, $apiKey) {
     }
     $recentTitle = $mostRecentWatched['MovieTitle'];
     $recentPosterPath = $mostRecentWatched['PosterURL'];
-    $recommendations = searchMoviesByTitle($recentTitle, $apiKey);
+    $recommendations = searchMoviesByTitle($recentTitle);
     $recommendations += getPopularRecommendations($apiKey, 10 - count($recommendations));
     return $recommendations;
 }
@@ -252,11 +252,11 @@ function getMostRecentWatched($username) {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
- //updated!   $sql = "SELECT Movie, PosterURL, Year
-//            FROM WatchedList
-//            WHERE AccountID = $accountId
-//            ORDER BY TimeCreated DESC
-//            LIMIT 1";
+    $sql = "SELECT Movie, PosterURL, Year
+            FROM WatchedList
+            WHERE AccountID = $accountId
+            ORDER BY TimeCreated DESC
+            LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $accountId);
     $stmt->execute();
