@@ -52,12 +52,12 @@ function requestProcessor($request) {
         // Handle adding a movie to the watch list
         case "addToWatchList":
             echo "adding to watch list\n";
-            return addToWatchList($request['username'], $request['movieTitle'], $request['posterURL'], $request['year']);
+            return addToWatchList($request['username'], $request['MovieID'], $request['movieTitle'], $request['posterURL'], $request['year']);
 
         // Handle adding a movie to the watched list
         case "addToWatchedList":
             echo "adding to watched list\n";
-            return addToWatchedList($request['username'], $request['movieTitle'], $request['posterURL'], $request['year']);
+            return addToWatchedList($request['username'], $request['MovieID'], $request['movieTitle'], $request['posterURL'], $request['year']);
         
         // Handle updating the user profile
         case "updateUserProfile":
@@ -77,7 +77,7 @@ function requestProcessor($request) {
         // Handle insertion of a movie review
         case "insertReview":
             echo "inserting review\n";
-            return insertReview($request['accountId'], $request['movieTitle'], $request['rating'], $request['review']);
+            return insertReview($request['accountId'], $request['MovieID'], $request['movieTitle'], $request['rating'], $request['review']);
 
         // Handle deletion of a movie from the watch list
         case "deleteFromWatchList":
@@ -87,7 +87,7 @@ function requestProcessor($request) {
         // Handle adding to watched list and removing from watch list
         case "addToWatchedListAndRemoveFromWatchList":
             echo "adding to watched list and removing from watch list\n";
-            return addToWatchedListAndRemoveFromWatchList($request['username'], $request['movieTitle'], $request['posterURL'], $request['year']);
+            return addToWatchedListAndRemoveFromWatchList($request['username'], $request['MovieID'], $request['movieTitle'], $request['posterURL'], $request['year']);
         
         // Default case for unhandled request types
         default:

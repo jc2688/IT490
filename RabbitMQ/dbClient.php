@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case "updateProfile":
         case "validateUserPreferences":
             $request['username'] = $_POST['username'];
+            $request['MovieID'] = $_POST['MovieID'];
             $request['favActor'] = $_POST['favActor'];
             $request['favGenre'] = $_POST['favGenre'];
             $request['favDirector'] = $_POST['favDirector'];
@@ -57,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle insertion of a new movie review
         case "insertReview":
             $request['accountId'] = $_POST['accountId'];
+            $request['MovieID'] = $_POST['MovieID'];
             $request['movieTitle'] = $_POST['movieTitle'];
             $request['rating'] = $_POST['rating'];
             $request['review'] = $_POST['review'];
