@@ -215,7 +215,7 @@ function getWatchedListData($username) {
 }
 
 //isfar
-function addToWatchList($MovieID, $username, $movieTitle, $posterURL, $year) {
+function addToWatchList($username, $MovieID, $movieTitle, $posterURL, $year) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
         return array('success' => false, 'message' => 'Username not found.');
@@ -245,7 +245,7 @@ function addToWatchList($MovieID, $username, $movieTitle, $posterURL, $year) {
 }
 
 //isfar
-function addToWatchedList($MovieID, $username, $movieTitle, $posterURL, $year) {
+function addToWatchedList($username, $MovieID, $movieTitle, $posterURL, $year) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
         return array('success' => false, 'message' => 'Username not found.');
