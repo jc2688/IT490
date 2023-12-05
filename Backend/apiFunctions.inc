@@ -12,7 +12,7 @@ function searchMoviesandTVShows($query) {
         $mediaList = array();
         foreach ($result['results'] as $media) {
             $mediaList[] = array(
-                'ID' => $media['id']
+                'ID' => $media['id'],
                 'Title' => $media['original_title'] ?? $media['original_name'],
                 'Type' => $media['media_type'],
                 'PosterURL' => isset($media['poster_path']) ? "https://image.tmdb.org/t/p/w500{$media['poster_path']}" : 'Not available',
