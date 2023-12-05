@@ -263,7 +263,7 @@ function getMostRecentWatched($username) {
     $result = $stmt->get_result();
     if ($row = $result->fetch_assoc()) {
         $mostRecentWatched = array(
-            'MovieTitle' => $row['MovieTitle'],
+            'MovieTitle' => $row['Movie'],
             'PosterURL' => $row['PosterURL'],
             'Year' => $row['Year'],
         );
