@@ -152,8 +152,8 @@ function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $f
 }
  $mysqli = dbConnect();
     $mysqli->close(); 
-}
-}
+    }
+
 
 //isfar
 function getWatchListData($username) {
