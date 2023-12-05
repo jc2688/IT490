@@ -215,7 +215,7 @@ function getWatchedListData($username) {
 }
 
 //isfar
-function addToWatchList($username, $movieTitle, $posterURL, $year) {
+function addToWatchList($MovieID, $username, $movieTitle, $posterURL, $year) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
         return array('success' => false, 'message' => 'Username not found.');
@@ -226,9 +226,9 @@ function addToWatchList($username, $movieTitle, $posterURL, $year) {
         $status['success'] = false;
         $status['message'] = "Connection failed: " . $conn->connect_error;
     } else {
-        $sql = "INSERT INTO WatchList (AccountID, Movie, PosterURL, Year, TimeCreated, LastModified) VALUES (?, ?, ?, ?, NOW(), NOW())";
+        $sql = "INSERT INTO WatchList (AccountID, MovieID, Movie, PosterURL, Year, TimeCreated, LastModified) VALUES (?, ?, ?, ?, NOW(), NOW())";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isss", $accountId, $movieTitle, $posterURL, $year);
+        $stmt->bind_param("isss", $accountId, $MovieID, $movieTitle, $posterURL, $year);
         if ($stmt->execute()) {
             $movieID = $stmt->insert_id; // Retrieve the last inserted ID
             $status['success'] = true;
@@ -245,7 +245,7 @@ function addToWatchList($username, $movieTitle, $posterURL, $year) {
 }
 
 //isfar
-function addToWatchedList($username, $movieTitle, $posterURL, $year) {
+function addToWatchedList($MovieID, $username, $movieTitle, $posterURL, $year) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
         return array('success' => false, 'message' => 'Username not found.');
@@ -256,9 +256,9 @@ function addToWatchedList($username, $movieTitle, $posterURL, $year) {
         $status['success'] = false;
         $status['message'] = "Connection failed: " . $conn->connect_error;
     } else {
-        $sql = "INSERT INTO WatchedList (AccountID, Movie, PosterURL, Year, TimeCreated, LastModified) VALUES (?, ?, ?, ?, NOW(), NOW())";
+        $sql = "INSERT INTO WatchedList (AccountID, MovieID, Movie, PosterURL, Year, TimeCreated, LastModified) VALUES (?, ?, ?, ?, NOW(), NOW())";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isss", $accountId, $movieTitle, $posterURL, $year);
+        $stmt->bind_param("isss", $accountId, $MovieID, $movieTitle, $posterURL, $year);
         if ($stmt->execute()) {
             $movieID = $stmt->insert_id; // Retrieve the last inserted ID
             $status['success'] = true;
