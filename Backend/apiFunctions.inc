@@ -241,6 +241,34 @@ function getRecentWatchedRecommendations($username) {
     $recommendations += getPopularRecommendations($apiKey, 10 - count($recommendations));
     return $recommendations;
 }
+//isfar
+function searchMoviesByTitle($title) {
+    global $apiKey;
+    $url = "https://api.themoviedb.org/3/search/movie";
+    $params = [
+        'api_key' => $apiKey,
+        'query' => urlencode($title),
+    ];
+    $url .= '?' . http_build_query($params);
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response, true);
+    if (isset($data['results'])) {
+        $movies = [];
+        foreach ($data['results'] as $result) {
+            $movies[] = [
+                'title' => $result['title'],
+                'poster_path' => $result['poster_path'],
+                'release_year' => $result['release_date'],
+            ];
+        }
+        return $movies;
+    } else {
+        return [];
+    }
+}
 
 //isfar
 function getMostRecentWatched($username) {
