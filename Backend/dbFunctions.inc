@@ -115,7 +115,7 @@ function getUserProfileData($username) {
             "FavoriteMovie" => $favoriteMovie,
             "FavoriteActor" => $favoriteActor,
             "Biography" => $bio,
-            "RateScore" => $ateScore
+            "RateScore" => $rateScore
             
         ];
         while ($stmt->fetch()) {
