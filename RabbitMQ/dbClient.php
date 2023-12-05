@@ -105,7 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Create a new RabbitMQ client instance, send the request, and output the response
-$client = new rabbitMQClient("testRabbitMQ.ini", "database");
+$client = new rabbitMQClient("testRabbitMQ.ini", "api");
 $response = $client->send_request($request);
-echo $response;
+header("Content-Type: application/json");
+echo json_encode($response);
+
+if (is_array($response)) {
+    $response = json_encode($response);
+}
 ?>
