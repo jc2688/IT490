@@ -148,12 +148,27 @@ function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $f
         }
         $updateStmt->close();
     }
+    $mysqli->close(); 
     return ["status" => 500, "message" => "Failed to update settings"]; 
 }
- $mysqli = dbConnect();
-    $mysqli->close(); 
-    }
 
+
+function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
+    $mysqli = dbConnect();
+    $AccountID = getAccountID($username);
+    $updateQuery = "UPDATE Profiles SET FavoriteDirector = ?, FavoriteGenre = ?, FavoriteMovie = ?, FavoriteActor = ?, Bio = ? WHERE AccountID = ?";
+    if ($updateStmt = $mysqli->prepare($updateQuery)) {
+        $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $AccountID);
+        if ($updateStmt->execute()) {
+            $updateStmt->close();
+            $mysqli->close();
+            return ["status" => 200, "message" => "Settings updated successfully"];
+        }
+        $updateStmt->close();
+    }
+    $mysqli->close();
+    return ["status" => 500, "message" => "Failed to update settings"];
+}
 
 //isfar
 function getWatchListData($username) {
