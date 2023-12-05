@@ -131,27 +131,6 @@ function getUserProfileData($username) {
 }
 
 //isfar
-function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
-    $mysqli = dbConnect();
-    $AccountID = getAccountID($username);
-    $sanitizedFavoriteActor = $database->real_escape_string($favActor);
-    $sanitizedFavoriteGenre = $database->real_escape_string($favGenre);
-    $sanitizedFavoriteDirector= $database->real_escape_string($favDirector);
-    $sanitizedFavoriteMovie = $database->real_escape_string($favMovie);
-    $sanitizedBiography= $database->real_escape_string($biography);
-    $updateQuery = "UPDATE Profiles SET FavoriteDirector = $sanitizedFavoriteDirector, FavoriteGenre = $sanitizedFavoriteGenre, FavoriteMovie = $sanitizedFavoriteMovie, FavoriteActor = $sanitizedFavoriteActor, Bio = $sanitizedBiography WHERE AccountID = $AccountID";
-    if ($updateStmt = $mysqli->prepare($updateQuery)) {
-        $updateStmt->bind_param("ssssss", $data['FavoriteDirector'], $data['FavoriteGenre'], $data['FavoriteMovie'], $data['FavoriteActor'], $data['Bio'], $sessionID);
-        if ($updateStmt->execute()) {
-            $updateStmt->close();
-            return ["status" => 200, "message" => "Settings updated successfully"];
-        }
-        $updateStmt->close();
-    }
-    $mysqli->close(); 
-    return ["status" => 500, "message" => "Failed to update settings"]; 
-}
-
 
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
     $mysqli = dbConnect();
