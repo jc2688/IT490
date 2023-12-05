@@ -275,7 +275,7 @@ function addToWatchedList($username, $MovieID, $movieTitle, $posterURL, $year) {
 }
 
 //isfar
-function addToWatchedListAndRemoveFromWatchList($username, $movieTitle, $posterURL, $year) {
+function addToWatchedListAndRemoveFromWatchList($username, $MovieID, $movieTitle, $posterURL, $year) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
         return array('success' => false, 'message' => 'Username not found.');
@@ -287,9 +287,9 @@ function addToWatchedListAndRemoveFromWatchList($username, $movieTitle, $posterU
         $status['success'] = false;
         $status['message'] = "Connection failed: " . $insertConn->connect_error . " | " . $deleteConn->connect_error;
     } else {
-        $watchedSql = "INSERT INTO WatchedList (AccountID, Movie, PosterURL, Year, TimeWatched) VALUES (?, ?, ?, ?, NOW())";
+        $watchedSql = "INSERT INTO WatchedList (AccountID, MovieID, Movie, PosterURL, Year, TimeWatched) VALUES (?, ?, ?, ?, NOW())";
         $watchedStmt = $insertConn->prepare($watchedSql);
-        $watchedStmt->bind_param("isss", $accountId, $movieTitle, $posterURL, $year);
+        $watchedStmt->bind_param("isss", $accountId, $MoviesID, $movieTitle, $posterURL, $year);
         if ($watchedStmt->execute()) {
             $movieID = $watchedStmt->insert_id; // Retrieve the last inserted ID
             $status['success'] = true;
