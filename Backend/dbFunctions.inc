@@ -448,14 +448,14 @@ function insertReview($accountId, $MovieID, $movieTitle, $rating, $review){
 function searchRatingsByMovie($movieTitle){
     $result = [];
     $connection = dbConnect();
-    $stmt = $connection->prepare("SELECT AccountID, Movie, Rating, Review FROM Rating WHERE Movie= $movieTitle");
+    $stmt = $connection->prepare("SELECT AccountID, Movie, Rating, Review FROM Rating WHERE Movie = ?");
     $stmt->bind_param("s", $movieTitle);
     $stmt->execute();
-    $stmt->bind_result($accountId, $movieTitle, $rating, $review);
+    $stmt->bind_result($accountId, $movie, $rating, $review);
     while($stmt->fetch()){
         $result[] = [
             "AccountID" => $accountId,
-            "movieTitle" => $movieTitle,
+            "movieTitle" => $movie,
             "Rating" => $rating,
             "Review" => $review
         ];
