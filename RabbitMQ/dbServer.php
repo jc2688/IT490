@@ -69,11 +69,6 @@ function requestProcessor($request) {
             echo "searching movie reviews\n";
             return searchRatingsByMovie($request['movieTitle']);
 
-        // Handle updating user preferences
-        case "updatePreferences":
-            echo "updating user preferences\n";
-            return validatePreferences($request['username'], $request['favoriteActor'], $request['favoriteDirector'], $request['favoriteMovie'], $request['favoriteGenre'], $request['biography']);
-
         // Handle request for leaderboard data
         case "getLeaderboard":
             echo "getting leaderboard\n";
@@ -88,6 +83,11 @@ function requestProcessor($request) {
         case "deleteFromWatchList":
             echo "deleting from watch list\n";
             return deleteFromWatchList($request['watchListID']);
+        
+        // Handle adding to watched list and removing from watch list
+        case "addToWatchedListAndRemoveFromWatchList":
+            echo "adding to watched list and removing from watch list\n";
+            return addToWatchedListAndRemoveFromWatchList($request['username'], $request['movieTitle'], $request['posterURL'], $request['year']);
         
         // Default case for unhandled request types
         default:

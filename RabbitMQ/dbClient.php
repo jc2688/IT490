@@ -35,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle user profile updates and preferences validation
         case "updateUserProfile":
         case "updateProfile":
-        case "updatePreferences":
         case "validateUserPreferences":
             $request['username'] = $_POST['username'];
             $request['favActor'] = $_POST['favActor'];
@@ -48,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle adding movies to watch list or watched list
         case "addToWatchList":
         case "addToWatchedList":
+        case "addToWatchedListAndRemoveFromWatchList":
             $request['username'] = $_POST['username'];
             $request['movieTitle'] = $_POST['movieTitle'];
             $request['posterURL'] = $_POST['posterURL'];
@@ -76,19 +76,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $request['type'] = $_GET["type"];
     
     switch ($request['type']) {
+        // Handle request for getting the leaderboard
         case "getLeaderboard":
             break;
-        
+
+        // Handle search for movie reviews
         case "searchMovieReviews":
             $request['movieTitle'] = $_GET['movieTitle'];
             break;
 
+        // Handle requests to get user profile, watch list, or watched list
         case "getUserProfile":
         case "getWatchList":
         case "getWatchedList":
             $request['username'] = $_GET['username'];
             break;
-
+        
+        // Default case for invalid request types
         default:
             echo json_encode(["error" => "Invalid GET request type"]);
             exit;
