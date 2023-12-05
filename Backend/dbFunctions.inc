@@ -106,7 +106,7 @@ function getUserProfileData($username) {
     }
     $query = "SELECT FavoriteDirector, FavoriteGenres, FavoriteMovie, FavoriteActor, Biography, RateScore FROM Profiles WHERE AccountID = $accountID";
     if ($stmt = $mysqli->prepare($query)) {
-        $stmt->bind_param("i", $accountID);
+      //  $stmt->bind_param("i", $accountID);
         $stmt->execute();
         $stmt->bind_result($favoriteDirector, $favoriteGenre, $favoriteMovie, $favoriteActor, $bio, $rateScore);
         $userData = [
