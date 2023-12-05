@@ -433,10 +433,10 @@ function deleteFromWatchList($watchListID) {
     return $status;
 }
 
-function insertReview($accountId, $movieTitle, $rating, $review){
+function insertReview($accountId, $MovieID, $movieTitle, $rating, $review){
     $connection = dbConnect();
-    $stmt = $connection->prepare("INSERT INTO Ratings(AccountID, Movie, Rating, Review) VALUES($accountId, $movieTitle, $rating, $review)");
-    $stmt->bind_param("dsds", $accountId, $movieTitle, $rating, $review);
+    $stmt = $connection->prepare("INSERT INTO Ratings(AccountID, MovieID, Movie, Rating, Review) VALUES($accountId, $movieTitle, $rating, $review)");
+    $stmt->bind_param("dsds", $accountId, $MovieID, $movieTitle, $rating, $review);
     $stmt->execute();
     $succeeded = $stmt->errno === 0;
     $stmt->close();
