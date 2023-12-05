@@ -109,18 +109,23 @@ function getUserProfileData($username) {
       //  $stmt->bind_param("i", $accountID);
         $stmt->execute();
         $stmt->bind_result($favoriteDirector, $favoriteGenre, $favoriteMovie, $favoriteActor, $bio, $rateScore);
-        $userData = [
-            "FavoriteDirector" => $favoriteDirector,
-            "FavoriteGenres" => $favoriteGenre,
-            "FavoriteMovie" => $favoriteMovie,
-            "FavoriteActor" => $favoriteActor,
-            "Biography" => $bio,
-            "RateScore" => $rateScore
+       // $userData = [
+         //   "FavoriteDirector" => $favoriteDirector,
+           // "FavoriteGenres" => $favoriteGenre,
+           // "FavoriteMovie" => $favoriteMovie,
+         //   "FavoriteActor" => $favoriteActor,
+         //   "Biography" => $bio,
+         //   "RateScore" => $rateScore
             
-        ];
+       // ];
         while ($stmt->fetch()) {
-            $userData['RatedMovies'][] = [
-                'RateScore' => $rateScore,
+            $userData[] = [
+                "FavoriteDirector" => $favoriteDirector,
+                "FavoriteGenres" => $favoriteGenre,
+                "FavoriteMovie" => $favoriteMovie,
+                "FavoriteActor" => $favoriteActor,
+                 "Biography" => $bio,
+                 "RateScore" => $rateScore
             ];
         }
         $stmt->close();
