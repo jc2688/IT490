@@ -255,7 +255,7 @@ function getMostRecentWatched($username) {
     }
     $sql = "SELECT Movie, PosterURL, Year
             FROM WatchedList
-            WHERE AccountID = $accountId
+            WHERE AccountID = ?
             LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $accountId);
