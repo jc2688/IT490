@@ -1,0 +1,4 @@
+check process rabbitAPIServer with pidfile /var/run/rabbitAPIServer.pid
+    start program = "/sbin/start rabbitAPIServer"
+    stop program  = "/sbin/stop rabbitAPIServer"
+    if 4 restarts within 20 cycles then timeout

@@ -1,0 +1,4 @@
+check process rabbitDBServer with pidfile /var/run/rabbitDBServer.pid
+    start program = "/sbin/start rabbitDBServer"
+    stop program  = "/sbin/stop rabbitDBServer"
+    if 4 restarts within 20 cycles then timeout
