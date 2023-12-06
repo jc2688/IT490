@@ -465,4 +465,22 @@ function searchRatingsByMovie($movieTitle){
     http_response_code(200);
     return json_encode(["returnCode" => '1', "reviews" => $result]);
 }
+
+function updateRateScore($username, $value) {
+    $mysqli = dbConnect();
+    $accountID = getAccountIdByUsername($username);
+    if (!$accountID) {
+        return false;
+    }
+    $query = "SELECT RateScore FROM Profiles WHERE AccountID = '$accountID'";
+    $result = $mysqli->query($query);
+    $row = $result->fetch_assoc();
+    $rateScore = $row['RateScore'];
+    $newRateScore = $rateScore + $value;
+    $updateQuery = "UPDATE Profiles SET RateScore = '$newRateScore' WHERE AccountID = '$accountID'";
+    if ($mysqli->query($updateQuery) === TRUE) {
+        return true;
+    }
+    return false;
+}
 ?>
