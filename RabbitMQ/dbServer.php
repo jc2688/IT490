@@ -27,7 +27,7 @@ function requestProcessor($request) {
         // Handle validation of user preferences
         case "validatePreferences":
             echo "validating preferences\n";
-            return validatePreferences($request['username'], $request['favoriteActor'], $request['favoriteDirector'], $request['favoriteMovie'], $request['favoriteGenre'], $request['biography']);
+            return validatePreferences($request['username'], $request['favActor'], $request['favDirector'], $request['favMovie'], $request['favGenre'], $request['biography']);
         
         // Handle request to get user profile
         case "getUserProfile":
