@@ -240,7 +240,7 @@ function addToWatchList($username, $MovieID, $movieTitle, $posterURL, $year) {
         $stmt->close();
     }
     $conn->close();
-    sendStatusToRabbitMQ(json_encode($status));
+   // sendStatusToRabbitMQ(json_encode($status));
     return $status;
 }
 
