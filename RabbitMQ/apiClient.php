@@ -60,7 +60,7 @@ if ($_POST) {
             break;
 
         // Handle get movie by details request
-        case "getMovieByDetails":
+        case "getMoviesByDetails":
             $request['movieID'] = $_POST['movieID'];
             break;
         
