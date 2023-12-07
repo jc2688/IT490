@@ -256,9 +256,9 @@ function addToWatchedList($username, $MovieID, $movieTitle, $posterURL, $year) {
         $status['success'] = false;
         $status['message'] = "Connection failed: " . $conn->connect_error;
     } else {
-        $sql = "INSERT INTO WatchedList (AccountID, MovieID, Movie, PosterURL, Year, TimeCreated, LastModified) VALUES (?, ?, ?, ?, NOW(), NOW())";
+        $sql = "INSERT INTO WatchedList (AccountID, MovieID, Movie, PosterURL, Year) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isss", $accountId, $MovieID, $movieTitle, $posterURL, $year);
+        $stmt->bind_param("issss", $accountId, $MovieID, $movieTitle, $posterURL, $year);
         if ($stmt->execute()) {
             $movieID = $stmt->insert_id; // Retrieve the last inserted ID
             $status['success'] = true;
@@ -270,7 +270,7 @@ function addToWatchedList($username, $MovieID, $movieTitle, $posterURL, $year) {
         $stmt->close();
     }
     $conn->close();
-    sendStatusToRabbitMQ(json_encode($status));
+    // sendStatusToRabbitMQ(json_encode($status));
     return $status;
 }
 
@@ -312,7 +312,7 @@ function addToWatchedListAndRemoveFromWatchList($username, $MovieID, $movieTitle
     }
     $insertConn->close();
     $deleteConn->close();
-    sendStatusToRabbitMQ(json_encode($status));
+   // sendStatusToRabbitMQ(json_encode($status));
     return $status;
 }
 
