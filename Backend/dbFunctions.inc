@@ -61,17 +61,17 @@ function validateRegister($firstname, $lastname, $username, $email, $address, $c
 
     while ($row = $result->fetch_assoc()) {
         if ($row["Username"] == $sanitizedUsername) {
-            return json_encode(array("returnCode" => '0', 'message' => "Username already exists, try again"));
+            return array("returnCode" => '0', "message" => "Username already exists, try again");
         }
         if ($row["Email"] == $sanitizedEmail) {
-            return json_encode(array("returnCode" => '0', 'message'=>"Email already exists, try again"));
+            return array("returnCode" => '0', 'message'=>"Email already exists, try again");
         }
     }
     $insertQuery = "INSERT INTO Accounts (FirstName, LastName, Username, Email, Address, City, Country, ZipCode, PasswordHash) VALUES ('$sanitizedFirstname', '$sanitizedLastname', '$sanitizedUsername', '$sanitizedEmail', '$sanitizedAddress', '$sanitizedCity', '$sanitizedCountry', '$sanitizedZipcode', '$sanitizedPassword')";
     if ($database->query($insertQuery) === TRUE) {
-        return json_encode(array("returnCode" => '1', 'message' => "Username and password accepted"));
+        return (array("returnCode" => '1', 'message' => "Username and password accepted"));
     }
-    return json_encode(array("returnCode" => '0', 'message' => "Error with registering, try again"));
+    return (array("returnCode" => '0', 'message' => "Error with registering, try again"));
 }
 
 //isfar
@@ -139,10 +139,10 @@ function getUserProfileData($username) {
 
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
     $mysqli = dbConnect();
-    $accountID = getAccountIdByUsername($username);
+    $AccountID = getAccountID($username);
     $updateQuery = "UPDATE Profiles SET FavoriteDirector = ?, FavoriteGenre = ?, FavoriteMovie = ?, FavoriteActor = ?, Bio = ? WHERE AccountID = ?";
     if ($updateStmt = $mysqli->prepare($updateQuery)) {
-        $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $accountID);
+        $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $AccountID);
         if ($updateStmt->execute()) {
             $updateStmt->close();
             $mysqli->close();
@@ -464,23 +464,5 @@ function searchRatingsByMovie($movieTitle){
     $connection->close();
     http_response_code(200);
     return json_encode(["returnCode" => '1', "reviews" => $result]);
-}
-
-function updateRateScore($username, $value) {
-    $mysqli = dbConnect();
-    $accountID = getAccountIdByUsername($username);
-    if (!$accountID) {
-        return false;
-    }
-    $query = "SELECT RateScore FROM Profiles WHERE AccountID = '$accountID'";
-    $result = $mysqli->query($query);
-    $row = $result->fetch_assoc();
-    $rateScore = $row['RateScore'];
-    $newRateScore = $rateScore + $value;
-    $updateQuery = "UPDATE Profiles SET RateScore = '$newRateScore' WHERE AccountID = '$accountID'";
-    if ($mysqli->query($updateQuery) === TRUE) {
-        return true;
-    }
-    return false;
 }
 ?>
