@@ -62,7 +62,7 @@ function requestProcessor($request) {
         // Handle updating the user profile
         case "updateUserProfile":
             echo "updating user profile\n";
-            return updateUserProfile($request['username'], $request['favoriteActor'], $request['favoriteMovie'], $request['favoriteDirector'], $request['favoriteGenres'], $request['biography']);
+            return updateUserProfile($request['username'], $request['favActor'], $request['favMovie'], $request['favDirector'], $request['favGenres'], $request['biography']);
 
         // Handle search for movie reviews
         case "searchMovieReviews":
