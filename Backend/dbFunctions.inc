@@ -226,9 +226,9 @@ function addToWatchList($username, $MovieID, $movieTitle, $posterURL, $year) {
         $status['success'] = false;
         $status['message'] = "Connection failed: " . $conn->connect_error;
     } else {
-        $sql = "INSERT INTO WatchList (AccountID, MovieID, Movie, PosterURL, Year, TimeCreated, LastModified) VALUES (?, ?, ?, ?, NOW(), NOW())";
+        $sql = "INSERT INTO WatchList (AccountID, MovieID, Movie, PosterURL, Year, TimeCreated, LastModified) VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isss", $accountId, $MovieID, $movieTitle, $posterURL, $year);
+        $stmt->bind_param("issss", $accountId, $MovieID, $movieTitle, $posterURL, $year);
         if ($stmt->execute()) {
             $movieID = $stmt->insert_id; // Retrieve the last inserted ID
             $status['success'] = true;
