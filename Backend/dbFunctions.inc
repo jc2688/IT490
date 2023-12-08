@@ -75,15 +75,15 @@ function validateRegister($firstname, $lastname, $username, $email, $address, $c
 }
 
 //isfar
-function validatePreferences($username, $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography) {
+function validatePreferences($username, $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography){
     $accountID = getAccountIdByUsername($username);
     if (!$accountID) {
         return array('error' => 'Username not found.');
     }
     $mysqli = dbConnect();
-    $query = "UPDATE Profiles SET FavoriteActor = ?, FavoriteDirector = ?, FavoriteMovie = ?, FavoriteGenres = ?, Biography = ? WHERE AccountID = ?";
+    $query = "INSERT INTO Profiles (AccountID, FavoriteActor, FavoriteDirector, FavoriteMovie, FavoriteGenre, Biography) VALUES (?, ?, ?, ?, ?, ?)";
     if ($stmt = $mysqli->prepare($query)) {
-        $stmt->bind_param("sssssi", $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography, $accountID);
+        $stmt->bind_param("sssssi", $accountID, $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography );
         if ($stmt->execute()) {
             $stmt->close();
             $mysqli->close();
