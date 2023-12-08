@@ -81,7 +81,7 @@ function validatePreferences($username, $favoriteActor, $favoriteDirector, $favo
         return array('error' => 'Username not found.');
     }
     $mysqli = dbConnect();
-    $query = "INSERT INTO Profiles (AccountID, FavoriteActor, FavoriteDirector, FavoriteMovie, FavoriteGenre, Biography) VALUES (?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO Profiles (AccountID, FavoriteActor, FavoriteDirector, FavoriteMovie, FavoriteGenres, Biography) VALUES (?, ?, ?, ?, ?, ?)";
     if ($stmt = $mysqli->prepare($query)) {
         $stmt->bind_param("sssssi", $accountID, $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography );
         if ($stmt->execute()) {
