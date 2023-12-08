@@ -83,7 +83,7 @@ function validatePreferences($username, $favoriteActor, $favoriteDirector, $favo
     $mysqli = dbConnect();
     $query = "INSERT INTO Profiles (AccountID, FavoriteActor, FavoriteDirector, FavoriteMovie, FavoriteGenres, Biography) VALUES (?, ?, ?, ?, ?, ?)";
     if ($stmt = $mysqli->prepare($query)) {
-        $stmt->bind_param("ssssss", $accountID, $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography );
+        $stmt->bind_param("isssss", $accountID, $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography );
         if ($stmt->execute()) {
             $stmt->close();
             $mysqli->close();
