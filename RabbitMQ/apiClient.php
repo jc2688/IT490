@@ -4,10 +4,11 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
+$request = array();
+
 // Check if there is a POST request
-if ($_POST) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Initialize an array to store the request data and set the 'type' of request based on POST data
-    $request = array();
     $request['type'] = $_POST["type"];
     
     // Switch case to handle different request types
@@ -44,34 +45,50 @@ if ($_POST) {
             $request['username'] = $_POST['username'];
             break;
 
+        // Default case for invalid request types
+        default:
+            echo json_encode(["error" => "Invalid request type"]);
+            exit;
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["type"])) {
+    // Initialize an array to store the request data and set the 'type' of request based on POST data
+    $request['type'] = $_GET["type"];
+    
+    // Switch case to handle different request types
+    switch ($request['type']) {
         // Handle get movies by actor request
         case "getMoviesByActor":
-            $request['actorName'] = $_POST['actorName'];
+            $request['actorName'] = $_GET['actorName'];
             break;
 
         // Handle get movies by director request
         case "getMoviesByDirector":
-            $request['directorName'] = $_POST['directorName'];
+            $request['directorName'] = $_GET['directorName'];
             break;
 
         // Handle get movies by movie and genre request
         case "getMoviesByMovieAndGenre":
-            $request['username'] = $_POST['username'];
+            $request['username'] = $_GET['username'];
             break;
 
         // Handle get movie by details request
         case "getMoviesByDetails":
-            $request['movieID'] = $_POST['movieID'];
+            $request['movieID'] = $_GET['movieID'];
+            break;
+
+        // Handle get movie by details request
+        case "getTVByDetails":
+            $request['tvID'] = $_GET['tvID'];
             break;
         
         // Handle get recent watched recommendations 
         case "getRecentWatchedRecommendations":
-            $request['username'] = $_POST['username'];
+            $request['username'] = $_GET['username'];
             break;
 
         // Handle get most recent watched movie request
         case "getMostRecentWatched":
-            $request['username'] = $_POST['username'];
+            $request['username'] = $_GET['username'];
             break;
 
         // Default case for invalid request types
@@ -79,20 +96,18 @@ if ($_POST) {
             echo json_encode(["error" => "Invalid request type"]);
             exit;
     }
-
-    // Create a new RabbitMQ client instance, send the request, and output the response
-    $client = new rabbitMQClient("testRabbitMQ.ini", "api");
-    $response = $client->send_request($request);
-    header("Content-Type: application/json");
-    echo json_encode($response);
-
-    if (is_array($response)) {
-        $response = json_encode($response);
-    }
-
 } else {
-    // Output an error message if no POST data is received
-    echo json_encode(["error" => "No POST data received"]);
+    echo json_encode(["error" => "No valid request type detected"]);
+    exit;
+}
+
+// Create a new RabbitMQ client instance, send the request, and output the response
+$client = new rabbitMQClient("testRabbitMQ.ini", "api");
+$response = $client->send_request($request);
+header("Content-Type: application/json");
+echo json_encode($response);
+
+if (is_array($response)) {
+    $response = json_encode($response);
 }
 ?>
-
