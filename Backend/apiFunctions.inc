@@ -4,14 +4,18 @@ require_once('dbConnection.inc');
 $apiKey = 'ab0f6b84bbcbbd4066f4fee3eaba248c';
 
 
-
+// This function takes one parmater $query
 function searchMoviesAndTVShows($query) {
+    // Key is used for connecting to the TMBD
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/search/multi?api_key={$apiKey}&query=" . urlencode($query);
+    // Json response is put into the $result 
     $response = file_get_contents($apiUrl);
     $result = json_decode($response, true);
+    // If the results were true it will will start extracting the relevant data 
     if ($result && isset($result['results'])) {
         $mediaList = array();
+        // Will check the media type whether its a movie or tv show 
         foreach ($result['results'] as $media) {
             $mediaType = '';
             if (isset($media['media_type'])) {
@@ -21,6 +25,7 @@ function searchMoviesAndTVShows($query) {
             } elseif (isset($media['original_name'])) {
                 $mediaType = 'tvshow';
             }
+            // Gets the ID, Title, Type, and poster url 
             $mediaList[] = array(
                 'ID' => $media['id'],
                 'Title' => $media['original_title'] ?? $media['original_name'],
@@ -28,19 +33,26 @@ function searchMoviesAndTVShows($query) {
                 'PosterURL' => isset($media['poster_path']) ? "https://image.tmdb.org/t/p/w500{$media['poster_path']}" : 'Not available',
             );
         }
+        // Returns the mediaList with relevant information 
         return $mediaList;
     } else {
         return array('error' => 'No results found.');
     }
 }
-
+// This function takes the parameter $actorName 
 function searchPerson($actorName) {
+    // API key for the movie database
     global $apiKey;
+    // The API Url for finding the particular person 
     $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($actorName);
+    // A get request is made to the movie database
     $response = file_get_contents($apiUrl);
+    // Json response is decoded 
     $result = json_decode($response, true);
+    // Checks if there was atleast one person succesfully found
     if ($result && isset($result['results'][0])) {
         $person = $result['results'][0];
+    // If there was one person found it will return the name of the Person and ID
         $personDetails = array(
             'Name' => $person['name'],
             'ID' => $person['id'],
