@@ -11,12 +11,23 @@ function searchMoviesandTVShows($query) {
     if ($result && isset($result['results'])) {
         $mediaList = array();
         foreach ($result['results'] as $media) {
+            $mediaType = '';
+            if (isset($media['media_type'])) {
+                $mediaType = $media['media_type'];
+            } elseif (isset($media['original_title'])) {
+                $mediaType = 'movie';
+            } elseif (isset($media['original_name'])) {
+                $mediaType = 'tvshow';
+            }
+
+        foreach ($result['results'] as $media) {
             $mediaList[] = array(
                 'ID' => $media['id'],
                 'Title' => $media['original_title'] ?? $media['original_name'],
                 'Type' => $media['media_type'],
                 'PosterURL' => isset($media['poster_path']) ? "https://image.tmdb.org/t/p/w500{$media['poster_path']}" : 'Not available',
                 'Type' => $mediaType,
+                
 
             );
         }
