@@ -16,6 +16,8 @@ function searchMoviesandTVShows($query) {
                 'Title' => $media['original_title'] ?? $media['original_name'],
                 'Type' => $media['media_type'],
                 'PosterURL' => isset($media['poster_path']) ? "https://image.tmdb.org/t/p/w500{$media['poster_path']}" : 'Not available',
+                'Type' => $mediaType,
+
             );
         }
         return $mediaList;
