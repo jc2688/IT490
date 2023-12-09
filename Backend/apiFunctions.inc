@@ -272,6 +272,7 @@ function getMoviesByDetails($movieId) {
 } 
 
 //isfar
+// This functions take the parameter $username 
 function getRecentWatchedRecommendations($username) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
