@@ -95,20 +95,27 @@ function recommendationActorDirector($username) {
         return array('error' => 'User preferences not found.');
     }
 }
-
+// This function takes one parameter $favoriteActor 
 function getMoviesByActor($favoriteActor) {
+    // Key used to connect to the movie database
     global $apiKey;
+    // The actor's name is put in the API url  
     $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($favoriteActor);
+    // A get request is made to the movie database the json response is held in $result
     $response = file_get_contents($apiUrl);
     $result = json_decode($response, true);
+    // This if statement will check if their was atleast one person. The person ID is taken. 
     if ($result && isset($result['results'][0])) {
         $personId = $result['results'][0]['id'];
         $creditsUrl = "https://api.themoviedb.org/3/person/{$personId}/movie_credits?api_key={$apiKey}";
+        // Movie credits are found for the actor 
         $creditsResponse = file_get_contents($creditsUrl);
         $creditsResult = json_decode($creditsResponse, true);
+        // Goes through the cast and gets the credits 
         if ($creditsResult && isset($creditsResult['cast'])) {
             $recommendations = array();
             foreach ($creditsResult['cast'] as $movie) {
+            // Title and Poster will be put in an array for the cast. If nobody is found an error message will be displayed and if succesful the recomendations will be displayed
                 $recommendations[] = array(
                     'Title' => $movie['title'],
                     'PosterURL' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500{$movie['poster_path']}" : 'Not available',
