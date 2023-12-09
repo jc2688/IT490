@@ -3,38 +3,7 @@ require_once('dbConnection.inc');
 
 $apiKey = 'ab0f6b84bbcbbd4066f4fee3eaba248c';
 
-/*
-function searchMoviesandTVShows($query) {
-    global $apiKey;
-    $apiUrl = "https://api.themoviedb.org/3/search/multi?api_key={$apiKey}&query=" . urlencode($query);
-    $response = file_get_contents($apiUrl);
-    $result = json_decode($response, true);
-    if ($result && isset($result['results'])) {
-        $mediaList = array();
-        foreach ($result['results'] as $media) {
-            $mediaType = '';
-            if (isset($media['media_type'])) {
-                $mediaType = $media['media_type'];
-            } elseif (isset($media['original_title'])) {
-                $mediaType = 'movie';
-            } elseif (isset($media['original_name'])) {
-                $mediaType = 'tvshow';
-            }
 
-        foreach ($result['results'] as $media) {
-            $mediaList[] = array(
-                'ID' => $media['id'],
-                'Title' => $media['original_title'] ?? $media['original_name'],
-                'Type' => $media['media_type'],
-                'PosterURL' => isset($media['poster_path']) ? "https://image.tmdb.org/t/p/w500{$media['poster_path']}" : 'Not available',
-                'Type' => $mediaType);
-        }
-        return $mediaList;
-    } else {
-        return array('error' => 'No results found.');
-    }
-}
-*/
 
 function searchMoviesAndTVShows($query) {
     global $apiKey;
@@ -264,8 +233,6 @@ function getMoviesByDetails($movieId) {
     }
 } 
 
-
-
 //isfar
 function getRecentWatchedRecommendations($username) {
     $accountId = getAccountIdByUsername($username);
@@ -389,6 +356,19 @@ function getTVByDetails($movieId) {
         return ['error' => 'Movie not found.'];
     }
 }
+
+//isfar 
+function getMediaDetails($mediaId, $mediaType) {
+    if ($mediaType === 'movie') {
+        return getMoviesByDetails($mediaId);
+    } elseif ($mediaType === 'tv') {
+        return getTVByDetails($mediaId);
+    } else {
+        return ['error' => 'Invalid media type.'];
+    }
+}
+
+
 
 
 
