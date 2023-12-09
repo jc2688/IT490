@@ -166,27 +166,36 @@ function getMoviesByDirector($favoriteDirector) {
         return array('error' => 'Director not found.');
     }
 }
-
+// This function takes the parameter $username 
 function getMoviesByMovieAndGenre($username) {
+    // Key connects to the movie database
     global $apiKey;
+    //  Connects to database using our credentials. 
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    // An empty arry is returned if there is a connection error. 
     if ($conn->connect_error) {
         return [];
     }
+    // gets the account id with the username
     $accountId = getAccountIdByUsername($username);
+    // Favorite genre and movie is taken with the account id
     $sql = "SELECT FavoriteGenres, FavoriteMovie FROM Profiles WHERE AccountID = '$accountId'";
     $result = $conn->query($sql);
+    // Checks if anything was found with the profile 
     if ($result->num_rows > 0) {
         $profileData = $result->fetch_assoc();
         $favoriteGenre = $profileData['FavoriteGenres'];
         $favoriteMovie = $profileData['FavoriteMovie'];
+        // Finding the movies by genre with the api request 
         $tmdbApiUrl = 'https://api.themoviedb.org/3/';
         $tmdbDiscoverEndpoint = 'discover/movie';
         $apiEndpoint = $tmdbApiUrl . $tmdbDiscoverEndpoint . '?api_key=' . $apiKey . '&with_genres=' . urlencode($favoriteGenre);
         $apiResponse = file_get_contents($apiEndpoint);
+        // If the api request has an error it will return false
         if ($apiResponse === false) {
             return [];
         }
+        // Api response is decoded and the title, overview, and release date is returned 
         $moviesData = json_decode($apiResponse, true);
         $recommendedMovies = array_map(function ($movie) {
             return [
@@ -194,8 +203,10 @@ function getMoviesByMovieAndGenre($username) {
                 'overview' => $movie['overview'],
                 'release_date' => $movie['release_date'],
             ];
+        // There could be ten results that are recommended 
         }, $moviesData['results']);
         return array_slice($recommendedMovies, 0, 10);
+    // If nothing is found an empty array is displayed 
     } else {
         return [];
     }
@@ -274,14 +285,18 @@ function getMoviesByDetails($movieId) {
 //isfar
 // This functions take the parameter $username 
 function getRecentWatchedRecommendations($username) {
+    // The accountID is retreived with the $username 
     $accountId = getAccountIdByUsername($username);
+    // If no one is found it will say no username found 
     if (!$accountId) {
         return array('error' => 'Username not found.');
     }
+    // Recommendations are found based on most recent watched 
     $mostRecentWatched = getMostRecentWatched($username);
     if (!$mostRecentWatched) {
         return getPopularRecommendations($apiKey);
     }
+    // Ten or less recommended movie titles are returned 
     $recentTitle = $mostRecentWatched['MovieTitle'];
     $recentPosterPath = $mostRecentWatched['PosterURL'];
     $recommendations = searchMoviesByTitle($recentTitle);
@@ -289,21 +304,28 @@ function getRecentWatchedRecommendations($username) {
     return $recommendations;
 }
 //isfar
+// This function takes the parameter $title
 function searchMoviesByTitle($title) {
+    // The key used for the movie database 
     global $apiKey;
+    // The api url is made with its parameters and what to search for 
     $url = "https://api.themoviedb.org/3/search/movie";
     $params = [
         'api_key' => $apiKey,
         'query' => urlencode($title),
     ];
+    // Curl is set
     $url .= '?' . http_build_query($params);
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
     curl_close($ch);
+    // A result is put into $data
     $data = json_decode($response, true);
+    // The if checks if there are results in $data. 
     if (isset($data['results'])) {
         $movies = [];
+        // The title, poster, and release year are returned 
         foreach ($data['results'] as $result) {
             $movies[] = [
                 'title' => $result['title'],
@@ -312,26 +334,34 @@ function searchMoviesByTitle($title) {
             ];
         }
         return $movies;
+    // Otherwise it will print nothing if no results were found
     } else {
         return [];
     }
 }
 
 //isfar
+// This function takes the parameter $username. 
 function getMostRecentWatched($username) {
     global $apiKey;
+    // Gets the account ID associated with the username
     $accountId = getAccountIdByUsername($username);
+    // If the username is not found an error message is displayed 
     if (!$accountId) {
         return array('error' => 'Username not found.');
     }
+    // Connects to our database using our credentials. 
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    // An error message is displayed if the connection gets displayed. 
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
+    // Gets Movie, PosterURL, and year are taken from watched list associated with the particular account ID
     $sql = "SELECT Movie, PosterURL, Year
             FROM WatchedList
             WHERE AccountID = ?
             LIMIT 1";
+    // If something is found it will print out the relevant details otherwise most recent watched is set to null. 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $accountId);
     $stmt->execute();
@@ -345,6 +375,7 @@ function getMostRecentWatched($username) {
     } else {
         $mostRecentWatched = null;
     }
+    // Connection is closed 
     $stmt->close();
     $conn->close();
     return $mostRecentWatched;
