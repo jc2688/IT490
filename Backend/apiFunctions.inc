@@ -217,7 +217,7 @@ function getAccountIdByUsername($username) {
     }
 }
 
-/*function getMoviesByDetails($movieId) {
+function getMoviesByDetails($movieId) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/movie/{$movieId}?api_key={$apiKey}";
     $response = file_get_contents($apiUrl);
@@ -262,7 +262,7 @@ function getAccountIdByUsername($username) {
     } else {
         return ['error' => 'Movie not found.'];
     }
-} */
+} 
 
 
 
