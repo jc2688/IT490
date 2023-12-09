@@ -129,20 +129,27 @@ function getMoviesByActor($favoriteActor) {
         return array('error' => 'Actor not found.');
     }
 }
-
+// This function takes the parameter $favoriteDirector  
 function getMoviesByDirector($favoriteDirector) {
+    // Connects to the movie database
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($favoriteDirector);
+    // A get request is made to the movie database 
     $response = file_get_contents($apiUrl);
+    // Json is than decoded in $result 
     $result = json_decode($response, true);
+    // Checks to see if there was atleast one person it then checks for the person ID
     if ($result && isset($result['results'][0])) {
         $personId = $result['results'][0]['id'];
+        // Another get request is made to get the credits for the director
         $creditsUrl = "https://api.themoviedb.org/3/person/{$personId}/movie_credits?api_key={$apiKey}";
         $creditsResponse = file_get_contents($creditsUrl);
         $creditsResult = json_decode($creditsResponse, true);
+        // In the cast it will check for directors 
         if ($creditsResult && isset($creditsResult['crew'])) {
             $recommendations = array();
             foreach ($creditsResult['crew'] as $movie) {
+                // if they are a director it will display reccomendations and will display the title and poster url 
                 if (isset($movie['job']) && $movie['job'] == 'Director') {
                     $recommendations[] = array(
                         'Title' => $movie['title'],
@@ -150,6 +157,7 @@ function getMoviesByDirector($favoriteDirector) {
                     );
                 }
             }
+            // Recomendations will be displayed and if there is none an error message displayed 
             return $recommendations;
         } else {
             return array('error' => 'Error retrieving movie credits.');
@@ -192,20 +200,24 @@ function getMoviesByMovieAndGenre($username) {
         return [];
     }
 }
-
+// This function takes the parameter $username 
 function getAccountIdByUsername($username) {
+    // This will connect to our databse using our credentials. If there is an error, a message is displayed 
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
     $username = $conn->real_escape_string($username);
+    // Account ID is associated with the username 
     $sql = "SELECT AccountID FROM Accounts WHERE Username = '$username'";
     $result = $conn->query($sql);
+    // If the user name was found it gets the account ID 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $accountId = $row['AccountID'];
         $conn->close();
         return $accountId;
+    // If the username was not found the database connection is closed and returns false
     } else {
         $conn->close();
         return false;
