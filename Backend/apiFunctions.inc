@@ -62,27 +62,34 @@ function searchPerson($actorName) {
         return array('error' => 'Person not found.');
     }
 }
-
+// This function takes the parameter $username. Recomendations will be given depending on your favorite actor and director 
 function recommendationActorDirector($username) {
+    // Gets the Account ID associated with a particular user name.
     $accountId = getAccountIdByUsername($username);
+    // If the user name is not found it will return an error message "Username not found" 
     if (!$accountId) {
         return array('error' => 'Username not found.');
     }
+    // This will connect to our database using our credentials. If the connection fails it will display a message 
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
+    // This selects the favorite and actor with the associated account ID
     $sql = "SELECT FavoriteActor, FavoriteDirector FROM Profiles WHERE AccountID = '$accountId'";
     $result = $conn->query($sql);
+    // if there is something there it will then proceed to extract the relevant info
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $favoriteActor = $row['FavoriteActor'];
         $favoriteDirector = $row['FavoriteDirector'];
         $conn->close();
         global $apiKey;
+        // It than gets the favorite actor and director for the recomendations to be given based on the user's prefrence 
         $actorRecommendations = getMoviesByActor($favoriteActor);
         $directorRecommendations = getMoviesByDirector($favoriteDirector);
         return array_merge($actorRecommendations, $directorRecommendations);
+    // if nothing was found an error message is shown 
     } else {
         $conn->close();
         return array('error' => 'User preferences not found.');
