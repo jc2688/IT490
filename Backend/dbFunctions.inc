@@ -165,7 +165,7 @@ function getWatchListData($username) {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     } else {
-        $sql = "SELECT MovieID, Movie, PosterURL, Year FROM WatchList WHERE AccountID = ?";
+        $sql = "SELECT ListID, MovieID, Movie, PosterURL, Year FROM WatchList WHERE AccountID = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $accountId);
         $stmt->execute();
@@ -195,7 +195,7 @@ function getWatchedListData($username) {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     } else {
-     $sql = "SELECT MovieID, Movie, PosterURL, Year FROM WatchedList WHERE AccountID = ?";
+     $sql = "SELECT ListID, MovieID, Movie, PosterURL, Year FROM WatchedList WHERE AccountID = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $accountId);
         $stmt->execute();
