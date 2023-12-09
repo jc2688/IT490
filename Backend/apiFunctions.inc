@@ -176,7 +176,7 @@ function getAccountIdByUsername($username) {
     }
 }
 
-function getMoviesByDetails($movieId) {
+/*function getMoviesByDetails($movieId) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/movie/{$movieId}?api_key={$apiKey}";
     $response = file_get_contents($apiUrl);
@@ -221,7 +221,7 @@ function getMoviesByDetails($movieId) {
     } else {
         return ['error' => 'Movie not found.'];
     }
-}
+} */
 
 
 
@@ -302,6 +302,53 @@ function getMostRecentWatched($username) {
     $conn->close();
     return $mostRecentWatched;
 }
+function getTVByDetails($movieId) {
+    global $apiKey;
+    $apiUrl = "https://api.themoviedb.org/3/tv/{$movieId}?api_key={$apiKey}";
+    $response = file_get_contents($apiUrl);
+    $result = json_decode($response, true);
+
+    if ($result) {
+        $recommendations = [
+            'name' => $result['name'],
+            'PosterURL' => isset($result['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $result['poster_path'] : 'Not available',
+            'Genre' => [],
+            'Actors' => [],
+            'Director' => '',
+            'first_air_date' => $result['first_air_date'],
+            'Overview' => $result['overview']
+        ];
+
+        foreach ($result['genres'] as $genre) {
+            $recommendations['Genre'][] = $genre['name'];
+        }
+
+        $creditUrl = "https://api.themoviedb.org/3/movie/{$movieId}/credits?api_key={$apiKey}";
+        $creditResponse = file_get_contents($creditUrl);
+        $creditResult = json_decode($creditResponse, true);
+
+        if ($creditResult) {
+            foreach ($creditResult['crew'] as $crewMember) {
+                if (isset($crewMember['job']) && $crewMember['job'] == 'Director') {
+                    $recommendations['Director'] = $crewMember['name'];
+                }
+            }
+
+            foreach ($creditResult['cast'] as $castMember) {
+                if (isset($castMember['known_for_department']) && $castMember['known_for_department'] == 'Acting') {
+                    $recommendations['Actors'][] = $castMember['name'];
+                }
+            }
+        } else {
+            return ['error' => 'Error retrieving movie credits.'];
+        }
+
+        return $recommendations;
+    } else {
+        return ['error' => 'Movie not found.'];
+    }
+}
+
 
 
 ?>
