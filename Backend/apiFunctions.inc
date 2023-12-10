@@ -401,7 +401,7 @@ function getTVByDetails($movieId) {
             $recommendations['Genre'][] = $genre['name'];
         }
 
-        $creditUrl = "https://api.themoviedb.org/3/movie/{$movieId}/credits?api_key={$apiKey}";
+        $creditUrl = "https://api.themoviedb.org/3/tv/{$movieId}/credits?api_key={$apiKey}";
         $creditResponse = file_get_contents($creditUrl);
         $creditResult = json_decode($creditResponse, true);
 
