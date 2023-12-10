@@ -405,6 +405,8 @@ function getMostRecentWatched($username) {
     $conn->close();
     return $mostRecentWatched;
 }
+
+/*
 function getTVByDetails($movieId) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/tv/{$movieId}?api_key={$apiKey}";
@@ -451,6 +453,74 @@ function getTVByDetails($movieId) {
         return ['error' => 'Movie not found.'];
     }
 }
+*/
+
+//isfar
+function getTVByDetails($movieId) {
+    global $apiKey;
+    $apiUrl = "https://api.themoviedb.org/3/tv/{$movieId}?api_key={$apiKey}";
+    $response = file_get_contents($apiUrl);
+    $result = json_decode($response, true);
+    if (!$result) {
+        return ['error' => 'TV show not found.'];
+    }
+    $providersUrl = "https://api.themoviedb.org/3/tv/{$movieId}/watch/providers?api_key={$apiKey}";
+    $providersResponse = file_get_contents($providersUrl);
+    $providersResult = json_decode($providersResponse, true);
+    $translationsUrl = "https://api.themoviedb.org/3/tv/{$movieId}/translations?api_key={$apiKey}";
+    $translationsResponse = file_get_contents($translationsUrl);
+    $translationsResult = json_decode($translationsResponse, true);
+    $recommendations = [
+        'name' => $result['name'],
+        'PosterURL' => isset($result['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $result['poster_path'] : 'Not available',
+        'Genre' => [],
+        'Actors' => [],
+        'Director' => '',
+        'first_air_date' => $result['first_air_date'],
+        'Overview' => $result['overview'],
+        'StreamingServices' => [],
+        'Languages' => [],
+    ];
+    foreach ($result['genres'] as $genre) {
+        $recommendations['Genre'][] = $genre['name'];
+    }
+    $creditUrl = "https://api.themoviedb.org/3/tv/{$movieId}/credits?api_key={$apiKey}";
+    $creditResponse = file_get_contents($creditUrl);
+    $creditResult = json_decode($creditResponse, true);
+    if ($creditResult) {
+        foreach ($creditResult['crew'] as $crewMember) {
+            if (isset($crewMember['job']) && $crewMember['job'] == 'Director') {
+                $recommendations['Director'] = $crewMember['name'];
+            }
+        }
+        foreach ($creditResult['cast'] as $castMember) {
+            if (isset($castMember['known_for_department']) && $castMember['known_for_department'] == 'Acting') {
+                $recommendations['Actors'][] = $castMember['name'];
+            }
+        }
+    } else {
+        return ['error' => 'Error retrieving TV show credits.'];
+    }
+    if (isset($providersResult['results'])) {
+        foreach ($providersResult['results'] as $provider) {
+            if ($provider['iso_3166_1'] === 'US') {
+                foreach ($provider['flatrate'] as $flatrate) {
+                    $recommendations['StreamingServices'][] = $flatrate['provider_name'];
+                }
+            }
+        }
+    }
+    if (isset($translationsResult['translations'])) {
+        foreach ($translationsResult['translations'] as $translation) {
+            $recommendations['Languages'][] = $translation['english_name'];
+        }
+    }
+    return $recommendations;
+}
+
+
+
+
 
 //isfar 
 // Takes two parameters mediaID, and media type. It calls the two functions getMovieByDetails and getTVByDetails depending what the media type is. 
