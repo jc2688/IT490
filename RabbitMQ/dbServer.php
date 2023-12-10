@@ -52,12 +52,12 @@ function requestProcessor($request) {
         // Handle adding a movie to the watch list
         case "addToWatchList":
             echo "adding to watch list\n";
-            return addToWatchList($request['username'], $request['MovieID'], $request['movieTitle'], $request['posterURL'], $request['year']);
+            return addToWatchList($request['username'], $request['MovieID'], $request['movieTitle'], $request['posterURL'], $request['year'], $request['mediaType']);
 
         // Handle adding a movie to the watched list
         case "addToWatchedList":
             echo "adding to watched list\n";
-            return addToWatchedList($request['username'], $request['MovieID'], $request['movieTitle'], $request['posterURL'], $request['year']);
+            return addToWatchedList($request['username'], $request['MovieID'], $request['movieTitle'], $request['posterURL'], $request['year'], $request['mediaType']);
         
         // Handle updating the user profile
         case "updateUserProfile":
@@ -87,7 +87,7 @@ function requestProcessor($request) {
         // Handle adding to watched list and removing from watch list
         case "addToWatchedListAndRemoveFromWatchList":
             echo "adding to watched list and removing from watch list\n";
-            return addToWatchedListAndRemoveFromWatchList($request['username'], $request['MovieID'], $request['movieTitle'], $request['posterURL'], $request['year']);
+            return addToWatchedListAndRemoveFromWatchList($request['username'], $request['MovieID'], $request['movieTitle'], $request['posterURL'], $request['year'], $request['mediaType']);
         
         // Default case for unhandled request types
         default:

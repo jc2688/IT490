@@ -53,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $request['movieTitle'] = $_POST['movieTitle'];
             $request['posterURL'] = $_POST['posterURL'];
             $request['year'] = $_POST['year'];
+            $request['mediaType'] = $_POST['mediaType'];
             break;
 
         // Handle insertion of a new movie review
