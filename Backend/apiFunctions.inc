@@ -300,7 +300,7 @@ function getRecentWatchedRecommendations($username) {
     $recentTitle = $mostRecentWatched['MovieTitle'];
     $recentPosterPath = $mostRecentWatched['PosterURL'];
     $recommendations = searchMoviesByTitle($recentTitle);
-    $recommendations += getPopularRecommendations($apiKey, 10 - count($recommendations));
+    $recommendations += getPopularRecommendations(10 - count($recommendations));
     return $recommendations;
 }
 
