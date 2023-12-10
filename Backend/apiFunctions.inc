@@ -384,6 +384,7 @@ function getMostRecentWatched($username) {
     $sql = "SELECT Movie, PosterURL, Year
             FROM WatchedList
             WHERE AccountID = ?
+            ORDER BY TimeCreated DESC
             LIMIT 1";
     // If something is found it will print out the relevant details otherwise most recent watched is set to null. 
     $stmt = $conn->prepare($sql);
