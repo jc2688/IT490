@@ -202,6 +202,7 @@ function getMoviesByMovieAndGenre($username) {
                 'title' => $movie['title'],
                 'overview' => $movie['overview'],
                 'release_date' => $movie['release_date'],
+                'poster_path' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : 'Not available',
             ];
         // There could be ten results that are recommended 
         }, $moviesData['results']);
