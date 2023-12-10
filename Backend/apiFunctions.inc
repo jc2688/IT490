@@ -429,13 +429,13 @@ function getTVByDetails($movieId) {
 
 //isfar 
 // Takes two parameters mediaID, and media type. It calls the two functions getMovieByDetails and getTVByDetails depending what the media type is. 
-function getMediaDetails($mediaId, $mediaType) {
+function getMediaDetails($movieId, $mediaType) {
     // Checks to see if its a movie and if it is it will return the details 
     if ($mediaType === 'movie') {
-        return getMoviesByDetails($mediaId);
+        return getMoviesByDetails($movieId);
     // If it's a TV show the the details are returned 
     } elseif ($mediaType === 'tv') {
-        return getTVByDetails($mediaId);
+        return getTVByDetails($movieId);
     // if it's not a movie or tv show an error message is displayed 
     } else {
         return ['error' => 'Invalid media type.'];
