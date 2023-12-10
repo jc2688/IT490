@@ -303,6 +303,30 @@ function getRecentWatchedRecommendations($username) {
     $recommendations += getPopularRecommendations($apiKey, 10 - count($recommendations));
     return $recommendations;
 }
+
+//isfar
+function getPopularRecommendations() {
+    global $apiKey;
+    $apiEndpoint = 'https://api.themoviedb.org/3/movie/popular';
+    $params = [
+        'api_key' => $apiKey,
+        'language' => 'en-US',
+        'page' => 1, 
+    ];
+    $url = $apiEndpoint . '?' . http_build_query($params);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($curl);
+    curl_close($curl);
+    $result = json_decode($response, true);
+    if ($result && isset($result['results'])) {
+        $popularMovies = array_slice($result['results'], 0, 10);
+        return $popularMovies;
+    } else {
+        return ['error' => 'Unable to fetch popular movies.'];
+    }
+}
+
 //isfar
 // This function takes the parameter $title
 function searchMoviesByTitle($title) {
