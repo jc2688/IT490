@@ -385,34 +385,7 @@ function getAccountIdByUsername($username) {
     }
 }
 
-/*
-function calculateRateScoreAndLeaderboard() {
-$connection = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
-
-if ($connection->connect_error) {
-    die("Connection failed: " . $connection->connect_error);
-    $connection -> close();
-} else {
-    $query = "SELECT Profiles.RateScore, Profiles.AccountID, Accounts.Username 
-              FROM Profiles 
-              CROSS JOIN Accounts 
-              WHERE Accounts.AccountID = Profiles.AccountID 
-              ORDER BY RateScore DESC 
-              LIMIT 0, 10";
-    $result = mysqli_query($connection, $query);
-    if (!$result) {
-        die('Error in query: ' . mysqli_error($connection));
-    }
-    $leaderboard = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $leaderboard[] = $row;
-    }
-    mysqli_free_result($result);
-    return $leaderboard;
-}
-}
-*/
-
+//isfar
 function calculateRateScoreAndLeaderboard() {
     if ($connection->connect_error) {
         die("Connection failed: " . $connection->connect_error);
