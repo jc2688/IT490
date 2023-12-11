@@ -109,15 +109,6 @@ function getUserProfileData($username) {
         $stmt->bind_param("i", $accountID);
         $stmt->execute();
         $stmt->bind_result($favoriteDirector, $favoriteGenre, $favoriteMovie, $favoriteActor, $bio, $rateScore);
-       // $userData = [
-         //   "FavoriteDirector" => $favoriteDirector,
-           // "FavoriteGenres" => $favoriteGenre,
-           // "FavoriteMovie" => $favoriteMovie,
-         //   "FavoriteActor" => $favoriteActor,
-         //   "Biography" => $bio,
-         //   "RateScore" => $rateScore
-            
-       // ];
         while ($stmt->fetch()) {
             $userData[] = [
                 "FavoriteDirector" => $favoriteDirector,
@@ -484,7 +475,7 @@ function updateRateScore($username, $value) {
 
 //isfar
 function resetPassword($username, $email, $assword) {
-    global $connection;
+    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
     $query = "SELECT * FROM Users WHERE Username = ? AND Email = ?";
     $statement = $connection->prepare($query);
     if (!$statement) {
