@@ -384,7 +384,8 @@ function getAccountIdByUsername($username) {
         return false; // Username not found
     }
 }
-    
+
+/*
 function calculateRateScoreAndLeaderboard() {
 $connection = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
 
@@ -410,6 +411,31 @@ if ($connection->connect_error) {
     return $leaderboard;
 }
 }
+*/
+
+function calculateRateScoreAndLeaderboard($connection) {
+    if ($connection->connect_error) {
+        die("Connection failed: " . $connection->connect_error);
+    }
+    $query = "SELECT Profiles.RateScore, Profiles.AccountID, Accounts.Username 
+              FROM Profiles 
+              JOIN Accounts ON Accounts.AccountID = Profiles.AccountID 
+              ORDER BY RateScore DESC 
+              LIMIT 10";
+    $result = $connection->query($query);
+    if (!$result) {
+        die('Error in query: ' . $connection->error);
+    }
+    $leaderboard = [];
+    while ($row = $result->fetch_assoc()) {
+        $leaderboard[] = $row;
+    }
+    $result->free_result();
+    return $leaderboard;
+}
+
+
+
 
 function deleteFromWatchList($watchListID) {
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
