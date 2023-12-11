@@ -24,6 +24,7 @@ function requestProcessor($request) {
             echo "registering now\n";
             return validateRegister($request['firstname'], $request['lastname'], $request['username'], $request['email'], $request['address'], $request['city'], $request['country'], $request['zipcode'], $request['password']);
 
+        // Handle reset password request
         case "resetPassword":
             echo "reseting password\n";
             return resetPassword($request['username'], $request['email'], $request['password']);

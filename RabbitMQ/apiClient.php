@@ -7,23 +7,12 @@ require_once('rabbitMQLib.inc');
 $request = array();
 
 // Check if there is a POST request
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["type"])) {
     // Initialize an array to store the request data and set the 'type' of request based on POST data
     $request['type'] = $_POST["type"];
     
     // Switch case to handle different request types
     switch ($request['type']) {
-        // Handle display recommended movies request
-        case "displayRecommendedMovies":
-            $request['movieData'] = $_POST['movieData'];
-            $request['source'] = $_POST['source'];
-            break;
-
-        // Handle search movies request
-        case "searchMovies":
-            $request['query'] = $_POST['query'];
-            break;
-
         // Handle update user preferences request
         case "updateUserPreferences":
             $request['userID'] = $_POST['userID'];
@@ -75,18 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $request['movieID'] = $_GET['movieID'];
             $request['mediaType'] = $_GET['mediaType'];
             break;
-        
-        /*
-        // Handle get movie by details request
-        case "getMoviesByDetails":
-            $request['movieID'] = $_GET['movieID'];
-            break;
-
-        // Handle get movie by details request
-        case "getTVByDetails":
-            $request['tvID'] = $_GET['tvID'];
-            break;
-        */
         
         // Handle get recent watched recommendations 
         case "getRecentWatchedRecommendations":

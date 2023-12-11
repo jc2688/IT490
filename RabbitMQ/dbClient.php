@@ -8,7 +8,7 @@ require_once('rabbitMQLib.inc');
 $request = array();
 
 // Determine the type of request and populate the $request array
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["type"])) {
     $request['type'] = $_POST["type"];
     
     // Switch case to handle different request types
@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $request['password'] = $_POST['password'];
             break;
         
+        // Handle reset password    
         case "resetPassword":
             $request['username'] = $_POST['username'];
             $request['email'] = $_POST['email'];
@@ -79,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Default case for invalid request types
         default:
-            echo json_encode(["error" => "Invalid request type"]);
+            echo json_encode(["error" => "Invalid POST request type"]);
             exit;
     } 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["type"])) {
