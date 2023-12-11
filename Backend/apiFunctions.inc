@@ -455,7 +455,7 @@ function getTVByDetails($movieId) {
     }
 }
 */
-
+/*
 //isfar
 function getTVByDetails($movieId) {
     global $apiKey;
@@ -518,6 +518,94 @@ function getTVByDetails($movieId) {
     }
     return $recommendations;
 }
+*/
+
+function getWatchProviders($mediaId) {
+    global $apiKey;
+    $apiUrl = "https://api.themoviedb.org/3/movie/{$mediaId}/watch/providers";
+    $params = [
+        'api_key' => $apiKey,
+    ];
+    $url = $apiUrl . '?' . http_build_query($params);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($curl);
+    curl_close($curl);
+    $result = json_decode($response, true);
+    if ($result && isset($result['results'])) {
+        return $result['results'];
+    } else {
+        return ['error' => 'Unable to fetch watch providers.'];
+    }
+}
+
+function getTVByDetails($movieId) {
+    global $apiKey;
+    // Call getWatchProviders internally
+    $watchProviders = getWatchProviders($movieId);
+    $apiUrl = "https://api.themoviedb.org/3/tv/{$movieId}?api_key={$apiKey}";
+    $response = file_get_contents($apiUrl);
+    $result = json_decode($response, true);
+    if (!$result) {
+        return ['error' => 'TV show not found.'];
+    }
+    $providersUrl = "https://api.themoviedb.org/3/tv/{$movieId}/watch/providers?api_key={$apiKey}";
+    $providersResponse = file_get_contents($providersUrl);
+    $providersResult = json_decode($providersResponse, true);
+
+    $translationsUrl = "https://api.themoviedb.org/3/tv/{$movieId}/translations?api_key={$apiKey}";
+    $translationsResponse = file_get_contents($translationsUrl);
+    $translationsResult = json_decode($translationsResponse, true);
+    $recommendations = [
+        'name' => $result['name'],
+        'PosterURL' => isset($result['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $result['poster_path'] : 'Not available',
+        'Genre' => [],
+        'Actors' => [],
+        'Director' => '',
+        'first_air_date' => $result['first_air_date'],
+        'Overview' => $result['overview'],
+        'StreamingServices' => [],
+        'Languages' => [],
+    ];
+    foreach ($result['genres'] as $genre) {
+        $recommendations['Genre'][] = $genre['name'];
+    }
+    $creditUrl = "https://api.themoviedb.org/3/tv/{$movieId}/credits?api_key={$apiKey}";
+    $creditResponse = file_get_contents($creditUrl);
+    $creditResult = json_decode($creditResponse, true);
+    if ($creditResult) {
+        foreach ($creditResult['crew'] as $crewMember) {
+            if (isset($crewMember['job']) && $crewMember['job'] == 'Director') {
+                $recommendations['Director'] = $crewMember['name'];
+            }
+        }
+        foreach ($creditResult['cast'] as $castMember) {
+            if (isset($castMember['known_for_department']) && $castMember['known_for_department'] == 'Acting') {
+                $recommendations['Actors'][] = $castMember['name'];
+            }
+        }
+    } else {
+        return ['error' => 'Error retrieving TV show credits.'];
+    }
+    if (isset($providersResult['results'])) {
+        foreach ($providersResult['results'] as $provider) {
+            if ($provider['iso_3166_1'] === 'US') {
+                foreach ($provider['flatrate'] as $flatrate) {
+                    $recommendations['StreamingServices'][] = $flatrate['provider_name'];
+                }
+            }
+        }
+    }
+    if (isset($translationsResult['translations'])) {
+        foreach ($translationsResult['translations'] as $translation) {
+            $recommendations['Languages'][] = $translation['english_name'];
+        }
+    }
+    $recommendations['StreamingServices'] = array_merge($recommendations['StreamingServices'], $watchProviders);
+
+    return $recommendations;
+}
+
 
 
 
