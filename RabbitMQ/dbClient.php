@@ -31,6 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $request['zipcode'] = $_POST['zipcode'];
             $request['password'] = $_POST['password'];
             break;
+        
+        case "resetPassword":
+            $request['username'] = $_POST['username'];
+            $request['email'] = $_POST['email'];
+            $request['password'] = $_POST['password'];
+            break;
 
         // Handle user profile updates and preferences validation
         case "updateUserProfile":

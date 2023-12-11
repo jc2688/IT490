@@ -24,7 +24,11 @@ function requestProcessor($request) {
             echo "registering now\n";
             return validateRegister($request['firstname'], $request['lastname'], $request['username'], $request['email'], $request['address'], $request['city'], $request['country'], $request['zipcode'], $request['password']);
 
-        // Handle validation of user preferences
+        case "resetPassword":
+            echo "reseting password\n";
+            return resetPassword($request['username'], $request['email'], $request['password']);
+
+            // Handle validation of user preferences
         case "validatePreferences":
             echo "validating preferences\n";
             return validatePreferences($request['username'], $request['favActor'], $request['favDirector'], $request['favMovie'], $request['favGenre'], $request['biography']);
