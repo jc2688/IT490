@@ -50,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case "addToWatchedList":
         case "addToWatchedListAndRemoveFromWatchList":
             $request['username'] = $_POST['username'];
-            $request['MovieID'] = $_POST['MovieID'];
             $request['movieTitle'] = $_POST['movieTitle'];
+            $request['MovieID'] = $_POST['MovieID'];
             $request['posterURL'] = $_POST['posterURL'];
             $request['year'] = $_POST['year'];
             $request['mediaType'] = $_POST['mediaType'];
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Handle insertion of a new movie review
         case "insertReview":
-            $request['accountId'] = $_POST['accountId'];
+            $request['username'] = $_POST['username'];
             $request['MovieID'] = $_POST['MovieID'];
             $request['movieTitle'] = $_POST['movieTitle'];
             $request['rating'] = $_POST['rating'];
