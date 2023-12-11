@@ -119,6 +119,8 @@ function getMoviesByActor($favoriteActor) {
                 $recommendations[] = array(
                     'Title' => $movie['title'],
                     'PosterURL' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500{$movie['poster_path']}" : 'Not available',
+                    'MovieID' => $movie['id'],
+                    'MediaType' => 'movie',
                 );
             }
             return $recommendations;
@@ -154,6 +156,8 @@ function getMoviesByDirector($favoriteDirector) {
                     $recommendations[] = array(
                         'Title' => $movie['title'],
                         'PosterURL' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500{$movie['poster_path']}" : 'Not available',
+                        'MovieID' => $movie['id'],
+                        'MediaType' => 'movie',
                     );
                 }
             }
@@ -203,6 +207,8 @@ function getMoviesByMovieAndGenre($username) {
                 'overview' => $movie['overview'],
                 'release_date' => $movie['release_date'],
                 'poster_path' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : 'Not available',
+                'MovieID' => $movie['id'],
+                'MediaType' => 'movie',
             ];
         // There could be ten results that are recommended 
         }, $moviesData['results']);
@@ -285,7 +291,7 @@ function getMoviesByDetails($movieId) {
 }
 
 //isfar
-// This functions take the parameter $username 
+// This function takes the parameter $username 
 function getRecentWatchedRecommendations($username) {
     // The accountID is retreived with the $username 
     $accountId = getAccountIdByUsername($username);
@@ -357,6 +363,8 @@ function searchMoviesByTitle($title) {
                 'title' => $result['title'],
                 'poster_path' => $result['poster_path'],
                 'release_year' => $result['release_date'],
+                'MovieID' => $movie['id'],
+                'MediaType' => 'movie',
             ];
         }
         return $movies;
@@ -514,13 +522,8 @@ function getTVByDetails($movieId) {
     return $recommendations;
 }
 
-
-
-
-
-
 //isfar 
-// Takes two parameters mediaID, and media type. It calls the two functions getMovieByDetails and getTVByDetails depending what the media type is. 
+// Takes two parameters movieId, and mediaType. It calls the two functions getMovieByDetails and getTVByDetails depending what the media type is. 
 function getMediaDetails($movieId, $mediaType) {
     // Checks to see if its a movie and if it is it will return the details 
     if ($mediaType === 'movie') {
