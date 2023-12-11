@@ -508,5 +508,38 @@ function updateRateScore($username, $value) {
         return true;
     }
     return false;
+
+//isfar
+function resetPassword($username, $email, $assword) {
+    global $connection;
+    $query = "SELECT * FROM Users WHERE Username = ? AND Email = ?";
+    $statement = $connection->prepare($query);
+    if (!$statement) {
+        return ['success' => false, 'message' => 'Error in query preparation: ' . $connection->error];
+    }
+    $statement->bind_param('ss', $username, $email);
+    $statement->execute();
+    $result = $statement->get_result();
+    if ($result->num_rows == 0) {
+        return ['success' => false, 'message' => 'Invalid username or email.'];
+    }
+//JAKEEEEEEE DO STUFF HERE
+    $updateQuery = "UPDATE Users SET Password = ? WHERE Username = ?";
+    $updateStatement = $connection->prepare($updateQuery);
+    if (!$updateStatement) {
+        return ['success' => false, 'message' => 'Error in query preparation: ' . $connection->error];
+    }
+    $updateStatement->bind_param('ss', $password, $username);
+    $updateResult = $updateStatement->execute();
+    if ($updateResult) {
+        return ['success' => true, 'message' => 'Password reset successfully.'];
+    } else {
+        return ['success' => false, 'message' => 'Error resetting password: ' . $updateStatement->error];
+    }
+    $statement->close();
+    $updateStatement->close();
+    $result->close();
+}
+
 }
 ?>
