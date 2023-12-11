@@ -456,7 +456,7 @@ function searchRatingsByMovie($movieTitle){
     $stmt->close();
     $connection->close();
     http_response_code(200);
-    return (["returnCode" => '1', "reviews" => $result]);
+    return array(["returnCode" => '1', "reviews" => $result]);
 }
 function updateRateScore($username, $value) {
     $mysqli = dbConnect();
