@@ -424,8 +424,9 @@ function deleteFromWatchList($watchListID) {
     return $status;
 }
 
-function insertReview($accountId, $MovieID, $movieTitle, $rating, $review){
+function insertReview($username, $MovieID, $movieTitle, $rating, $review){
     $connection = dbConnect();
+    $accountId = getAccountIdByUsername($username);
     $stmt = $connection->prepare("INSERT INTO Ratings(AccountID, MovieID, Movie, Rating, Review) VALUES($accountId, $movieTitle, $rating, $review)");
     $stmt->bind_param("dsds", $accountId, $MovieID, $movieTitle, $rating, $review);
     $stmt->execute();
@@ -434,6 +435,7 @@ function insertReview($accountId, $MovieID, $movieTitle, $rating, $review){
     $connection->close();
     http_response_code($succeeded ? 200 : 500);
     return json_encode(["returnCode" => $succeeded ? 1 : 0]);
+
 }
 
 function searchRatingsByMovie($movieTitle){
