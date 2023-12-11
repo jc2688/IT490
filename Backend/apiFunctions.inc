@@ -301,6 +301,7 @@ function getMoviesByDetails($movieId) {
             'ReleaseDate' => $result['release_date'],
             'Overview' => $result['overview'],
             'StreamingServices' => [],
+            'Languages' => [],
         ];
         foreach ($result['genres'] as $genre) {
             $recommendations['Genre'][] = $genre['name'];
