@@ -203,7 +203,7 @@ function getWatchedListData($username) {
         while ($row = $result->fetch_assoc()) {
             $watchedListData[] = array(
                 'MovieID' => $row['MovieID'],
-                'MovieTitle' => $row['MovieTitle'],
+                'MovieTitle' => $row['Movie'],
                 'PosterURL' => $row['PosterURL'],
                 'Year' => $row['Year'],
             );
