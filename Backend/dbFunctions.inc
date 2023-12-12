@@ -231,7 +231,6 @@ function addToWatchList($username, $MovieID, $movieTitle, $posterURL, $year, $me
         $stmt->close();
     }
     $conn->close();
-   // sendStatusToRabbitMQ(json_encode($status));
     return $status;
 }
 
@@ -261,7 +260,6 @@ function addToWatchedList($username, $MovieID, $movieTitle, $posterURL, $year, $
         $stmt->close();
     }
     $conn->close();
-    // sendStatusToRabbitMQ(json_encode($status));
     return $status;
 }
 
@@ -303,7 +301,6 @@ function addToWatchedListAndRemoveFromWatchList($username, $MovieID, $movieTitle
     }
     $insertConn->close();
     $deleteConn->close();
-   // sendStatusToRabbitMQ(json_encode($status));
     return $status;
 }
 
@@ -434,7 +431,7 @@ function insertReview($username, $MovieID, $movieTitle, $rating, $review, $Media
     $stmt->close();
     $connection->close();
     http_response_code($succeeded ? 200 : 500);
-    return json_encode(["returnCode" => $succeeded ? 1 : 0]);
+    return (["returnCode" => $succeeded ? 1 : 0]);
 
 }
 
