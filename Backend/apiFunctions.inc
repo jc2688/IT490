@@ -363,7 +363,7 @@ function searchMoviesByTitle($title) {
                 'title' => $result['title'],
                 'poster_path' => $result['poster_path'],
                 'release_year' => $result['release_date'],
-                'MovieID' => $movie['id'],
+                'MovieID' => $result['id'],
                 'MediaType' => 'movie',
             ];
         }
