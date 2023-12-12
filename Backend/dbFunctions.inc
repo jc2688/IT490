@@ -133,7 +133,7 @@ function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $f
     $AccountId = getAccountIdByUsername($username);
     $updateQuery = "UPDATE Profiles SET FavoriteDirector = ?, FavoriteGenre = ?, FavoriteMovie = ?, FavoriteActor = ?, Bio = ? WHERE AccountID = ?";
     if ($updateStmt = $mysqli->prepare($updateQuery)) {
-        $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $AccountID);
+        $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $AccountId);
         if ($updateStmt->execute()) {
             $updateStmt->close();
             $mysqli->close();
