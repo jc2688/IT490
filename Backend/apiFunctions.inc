@@ -120,7 +120,7 @@ function getMoviesByActor($favoriteActor) {
                     'Title' => $movie['title'],
                     'PosterURL' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500{$movie['poster_path']}" : 'Not available',
                     'MovieID' => $movie['id'],
-                    'MediaType' => 'movie',
+                    'MediaType' => $mediaType,
                 );
             }
             return $recommendations;
@@ -157,7 +157,7 @@ function getMoviesByDirector($favoriteDirector) {
                         'Title' => $movie['title'],
                         'PosterURL' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500{$movie['poster_path']}" : 'Not available',
                         'MovieID' => $movie['id'],
-                        'MediaType' => 'movie',
+                        'MediaType' => $mediaType,
                     );
                 }
             }
@@ -208,7 +208,7 @@ function getMoviesByMovieAndGenre($username) {
                 'release_date' => $movie['release_date'],
                 'poster_path' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : 'Not available',
                 'MovieID' => $movie['id'],
-                'MediaType' => 'movie',
+                'MediaType' => $mediaType,
             ];
         // There could be ten results that are recommended 
         }, $moviesData['results']);
@@ -241,8 +241,6 @@ function getAccountIdByUsername($username) {
         return false;
     }
 }
-
-
 
 //isfar
 function getMoviesByDetails($movieId) {
@@ -364,7 +362,7 @@ function searchMoviesByTitle($title) {
                 'poster_path' => $result['poster_path'],
                 'release_year' => $result['release_date'],
                 'MovieID' => $result['id'],
-                'MediaType' => 'movie',
+                'MediaType' => $mediaType,
             ];
         }
         return $movies;
