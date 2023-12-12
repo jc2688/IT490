@@ -130,10 +130,10 @@ function getUserProfileData($username) {
 
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
     $mysqli = dbConnect();
-    $AccountId = getAccountIdByUsername($username);
+    $accountId = getAccountIdByUsername($username);
     $updateQuery = "UPDATE Profiles SET FavoriteDirector = ?, FavoriteGenre = ?, FavoriteMovie = ?, FavoriteActor = ?, Bio = ? WHERE AccountID = ?";
     if ($updateStmt = $mysqli->prepare($updateQuery)) {
-        $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $AccountId);
+        $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $accountId);
         if ($updateStmt->execute()) {
             $updateStmt->close();
             $mysqli->close();
