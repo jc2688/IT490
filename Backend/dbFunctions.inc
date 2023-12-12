@@ -331,29 +331,6 @@ function processRequest() {
 }
 
 //isfar
-function updateUserProfile($username, $favoriteActor, $favoriteMovie, $favoriteDirector, $favoriteGenres, $biography) {
-    $mysqli = dbConnect();
-    $accountID = getAccountIdByUsername($username);
-    if (!$accountID) {
-        return false;
-}
-    $query = "UPDATE Profiles SET FavoriteActor = '$favoriteActor', FavoriteMovie = '$favoriteMovie', FavoriteDirector= '$favoriteDirector', FavoriteGenres = '$favoriteGenres', Biography = '$biography' WHERE AccountID = '$accountID'; ";
-    if ($stmt = $mysqli->prepare($query)) {
-       // $stmt->bind_param("sssssi", $favoriteActor, $favoriteMovie, $favoriteDirector, $favoriteGenres, $biography, $accountID);
-        if ($stmt->execute()) {
-            $stmt->close();
-            $mysqli->close();
-            return true;
-        } else {
-            $stmt->close();
-            $mysqli->close();
-            return false; 
-        }
-    }
-    return false;
-}
-
-//isfar
 function getAccountIdByUsername($username) {
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
     if ($conn->connect_error) {
