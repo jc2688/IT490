@@ -95,6 +95,7 @@ function recommendationActorDirector($username) {
         return array('error' => 'User preferences not found.');
     }
 }
+/*
 // This function takes one parameter $favoriteActor 
 function getMoviesByActor($favoriteActor) {
     // Key used to connect to the movie database
@@ -131,6 +132,56 @@ function getMoviesByActor($favoriteActor) {
         return array('error' => 'Actor not found.');
     }
 }
+*/
+
+function getMoviesByActor($favoriteActor) {
+    // Key used to connect to the movie database
+    global $apiKey;
+    // The actor's name is put in the API url  
+    $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($favoriteActor);
+    // A GET request is made to the movie database, and the JSON response is held in $result
+    $response = file_get_contents($apiUrl);
+    $result = json_decode($response, true);
+    // This if statement will check if there was at least one person. The person ID is taken. 
+    if ($result && isset($result['results'][0])) {
+        $personId = $result['results'][0]['id'];
+        // Additional API call to get combined credits (movies and TV shows)
+        $combinedCreditsUrl = "https://api.themoviedb.org/3/person/{$personId}/combined_credits?api_key={$apiKey}";
+        $combinedCreditsResponse = file_get_contents($combinedCreditsUrl);
+        $combinedCreditsResult = json_decode($combinedCreditsResponse, true);
+        // Initialize an array to store recommendations
+        $recommendations = array();
+        // Check if combined credits are available and iterate through the cast
+        if ($combinedCreditsResult && isset($combinedCreditsResult['cast'])) {
+            foreach ($combinedCreditsResult['cast'] as $media) {
+                // Check whether it's a movie or TV show and retrieve the title accordingly
+                $title = '';
+                if ($media['media_type'] == 'movie' && isset($media['original_title'])) {
+                    $title = $media['original_title'];
+                } elseif ($media['media_type'] == 'tv' && isset($media['original_name'])) {
+                    $title = $media['original_name'];
+                }
+                // Title and Poster will be put in an array for the cast.
+                $recommendations[] = array(
+                    'Title' => $title,
+                    'PosterURL' => isset($media['poster_path']) ? "https://image.tmdb.org/t/p/w500{$media['poster_path']}" : 'Not available',
+                    'MediaID' => $media['id'],
+                    'MediaType' => $media['media_type'], // Identify whether it's a movie or TV show
+                );
+            }
+        } else {
+            // If no combined credits are found, return an error
+            return array('error' => 'Error retrieving actor credits.');
+        }
+        return $recommendations;
+    } else {
+        return array('error' => 'Actor not found.');
+    }
+}
+
+
+
+/*
 // This function takes the parameter $favoriteDirector  
 function getMoviesByDirector($favoriteDirector) {
     // Connects to the movie database
@@ -170,6 +221,56 @@ function getMoviesByDirector($favoriteDirector) {
         return array('error' => 'Director not found.');
     }
 }
+*/
+
+function getMoviesByDirector($directorName) {
+    global $apiKey;
+    // API request to search for a person by the director's name
+    $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($directorName);
+    $response = file_get_contents($apiUrl);
+    $result = json_decode($response, true);
+    if ($result && isset($result['results'][0])) {
+        $personId = $result['results'][0]['id'];
+        // API request to get movie and TV show credits for the director
+        $creditsUrl = "https://api.themoviedb.org/3/person/{$personId}/combined_credits?api_key={$apiKey}";
+        $creditsResponse = file_get_contents($creditsUrl);
+        $creditsResult = json_decode($creditsResponse, true);
+        if ($creditsResult && isset($creditsResult['crew'])) {
+            $recommendations = array();
+            foreach ($creditsResult['crew'] as $media) {
+                // Check whether it's a movie or TV show and retrieve the title accordingly
+                $title = '';
+                $mediaType = '';
+                if ($media['media_type'] == 'movie') {
+                    $title = isset($media['original_title']) ? $media['original_title'] : '';
+                    $mediaType = 'movie';
+                } elseif ($media['media_type'] == 'tv') {
+                    $title = isset($media['name']) ? $media['name'] : '';
+                    $mediaType = 'tv';
+                }
+                // If they are a director, it will display recommendations and will display the title and poster URL
+                if (isset($media['job']) && $media['job'] == 'Director') {
+                    $recommendations[] = array(
+                        'Title' => $title,
+                        'PosterURL' => isset($media['poster_path']) ? "https://image.tmdb.org/t/p/w500{$media['poster_path']}" : 'Not available',
+                        'MediaID' => $media['id'],
+                        'MediaType' => $mediaType,
+                    );
+                }
+            }
+            // Recommendations will be displayed, and if there is none, an error message displayed
+            return $recommendations;
+        } else {
+            return array('error' => 'Error retrieving director credits.');
+        }
+    } else {
+        return array('error' => 'Director not found.');
+    }
+}
+
+
+
+
 // This function takes the parameter $username 
 function getMoviesByMovieAndGenre($username) {
     // Key connects to the movie database
