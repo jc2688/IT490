@@ -270,7 +270,7 @@ function getMoviesByDirector($directorName) {
 
 
 
-
+/*
 // This function takes the parameter $username 
 function getMoviesByMovieAndGenre($username) {
     // Key connects to the movie database
@@ -319,6 +319,61 @@ function getMoviesByMovieAndGenre($username) {
         return [];
     }
 }
+*/
+
+function getMoviesByMovieAndGenre($username) {
+    // Key connects to the movie database
+    global $apiKey;
+    //  Connects to the database using our credentials. 
+    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    // An empty array is returned if there is a connection error. 
+    if ($conn->connect_error) {
+        return [];
+    }
+    // gets the account id with the username
+    $accountId = getAccountIdByUsername($username);
+    // Favorite genre and movie are taken with the account id
+    $sql = "SELECT FavoriteGenres, FavoriteMovie FROM Profiles WHERE AccountID = '$accountId'";
+    $result = $conn->query($sql);
+    // Checks if anything was found with the profile 
+    if ($result->num_rows > 0) {
+        $profileData = $result->fetch_assoc();
+        $favoriteGenre = $profileData['FavoriteGenres'];
+        $favoriteMovie = $profileData['FavoriteMovie'];
+        // Finding the movies by genre with the API request 
+        $tmdbApiUrl = 'https://api.themoviedb.org/3/';
+        $tmdbDiscoverEndpoint = 'discover/movie';
+        $apiEndpoint = $tmdbApiUrl . $tmdbDiscoverEndpoint . '?api_key=' . $apiKey . '&with_genres=' . urlencode($favoriteGenre);
+        $apiResponse = file_get_contents($apiEndpoint);
+        // If the API request has an error, it will return false
+        if ($apiResponse === false) {
+            return [];
+        }
+        // API response is decoded, and the title, overview, and release date are returned 
+        $moviesData = json_decode($apiResponse, true);
+        $recommendedMovies = array_map(function ($movie) {
+            // Determine media type (movie or TV show)
+            $mediaType = isset($movie['media_type']) ? $movie['media_type'] : 'movie';
+            return [
+                'title' => $movie['title'],
+                'overview' => $movie['overview'],
+                'release_date' => $movie['release_date'],
+                'poster_path' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : 'Not available',
+                'MovieID' => $movie['id'],
+                'MediaType' => $mediaType,
+            ];
+        // There could be ten results that are recommended 
+        }, $moviesData['results']);
+        return array_slice($recommendedMovies, 0, 10);
+    // If nothing is found, an empty array is displayed 
+    } else {
+        return [];
+    }
+}
+
+
+
+
 // This function takes the parameter $username 
 function getAccountIdByUsername($username) {
     // This will connect to our databse using our credentials. If there is an error, a message is displayed 
