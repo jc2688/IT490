@@ -127,20 +127,24 @@ function getUserProfileData($username) {
 }
 
 //isfar
-
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
     $mysqli = dbConnect();
-    $accountId = getAccountIdByUsername($username);
-    $updateQuery = "UPDATE Profiles SET FavoriteDirector = ?, FavoriteGenre = ?, FavoriteMovie = ?, FavoriteActor = ?, Bio = ? WHERE AccountID = ?";
+    $AccountId = getAccountIdByUsername($username);
+    $updateQuery = "UPDATE Profiles SET FavoriteDirector = ?, FavoriteGenres = ?, FavoriteMovie = ?, FavoriteActor = ?, Biography = ? WHERE AccountID = ?";
+    
     if ($updateStmt = $mysqli->prepare($updateQuery)) {
-        $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $accountId);
+        // Use $AccountId instead of $AccountID in bind_param
+        $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $AccountId);
+        
         if ($updateStmt->execute()) {
             $updateStmt->close();
             $mysqli->close();
             return ["status" => 200, "message" => "Settings updated successfully"];
         }
+        
         $updateStmt->close();
     }
+    
     $mysqli->close();
     return ["status" => 500, "message" => "Failed to update settings"];
 }
