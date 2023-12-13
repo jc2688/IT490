@@ -7,7 +7,7 @@ ini_set('display_errors', 'On');
 //isfar + Sean
 function validateLogin($username, $password) {
     echo "Starting validation" . PHP_EOL;
-    $database = dbConnect();
+    $database = dbConnect("BackEndAdmin");
     echo "Database connected" . PHP_EOL;
     $sanitizedUsername = $database->real_escape_string($username);
     $sanitizedPassword = $database->real_escape_string($password);
@@ -46,7 +46,7 @@ function validateLogin($username, $password) {
 
 //isfar
 function validateRegister($firstname, $lastname, $username, $email, $address, $city, $country, $zipcode, $password) {
-    $database = dbConnect();
+    $database = dbConnect("BackEndAdmin");
     $sanitizedFirstname = $database->real_escape_string($firstname);
     $sanitizedLastname = $database->real_escape_string($lastname);
     $sanitizedUsername = $database->real_escape_string($username);
@@ -80,7 +80,7 @@ function validatePreferences($username, $favoriteActor, $favoriteDirector, $favo
     if (!$accountID) {
         return array('error' => 'Username not found.');
     }
-    $mysqli = dbConnect();
+    $mysqli = dbConnect("BackEndAdmin");
     $query = "INSERT INTO Profiles (AccountID, FavoriteActor, FavoriteDirector, FavoriteMovie, FavoriteGenres, Biography) VALUES (?, ?, ?, ?, ?, ?)";
     if ($stmt = $mysqli->prepare($query)) {
         $stmt->bind_param("isssss", $accountID, $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography );
@@ -99,7 +99,7 @@ function validatePreferences($username, $favoriteActor, $favoriteDirector, $favo
 
 //isfar
 function getUserProfileData($username) {
-    $mysqli = dbConnect();
+    $mysqli = dbConnect("BackEndAdmin");
     $accountID = getAccountIdByUsername($username);
     if (!$accountID) {
         return null;
@@ -128,7 +128,7 @@ function getUserProfileData($username) {
 
 //isfar
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
-    $mysqli = dbConnect();
+    $mysqli = dbConnect("BackEndAdmin");;
     $AccountId = getAccountIdByUsername($username);
     $updateQuery = "UPDATE Profiles SET FavoriteDirector = ?, FavoriteGenres = ?, FavoriteMovie = ?, FavoriteActor = ?, Biography = ? WHERE AccountID = ?";
     
@@ -155,7 +155,7 @@ function getWatchListData($username) {
     if (!$accountId) {
         return array('error' => 'Username not found.');
     }
-    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect("BackEndAdmin");
     $watchListData = array();
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
@@ -185,7 +185,7 @@ function getWatchedListData($username) {
     if (!$accountId) {
         return array('error' => 'Username not found.');
     }
-    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect("BackEndAdmin");
     $watchedListData = array();
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
@@ -215,7 +215,7 @@ function addToWatchList($username, $MovieID, $movieTitle, $posterURL, $year, $me
     if (!$accountId) {
         return array('success' => false, 'message' => 'Username not found.');
     }
-    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect("BackEndAdmin");
     $status = [];
     if ($conn->connect_error) {
         $status['success'] = false;
@@ -244,7 +244,7 @@ function addToWatchedList($username, $MovieID, $movieTitle, $posterURL, $year, $
     if (!$accountId) {
         return array('success' => false, 'message' => 'Username not found.');
     }
-    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect("BackEndAdmin");
     $status = [];
     if ($conn->connect_error) {
         $status['success'] = false;
@@ -273,8 +273,8 @@ function addToWatchedListAndRemoveFromWatchList($username, $MovieID, $movieTitle
     if (!$accountId) {
         return array('success' => false, 'message' => 'Username not found.');
     }
-    $insertConn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
-    $deleteConn = new mysqli('10.244.1.2', 'DeleteAccessOnly', 'cl3v3rm@ndoesTh1ngs!', 'SceneSync');
+    $insertConn = dbConnect("BackEndAdmin");
+    $deleteConn = dbConnect("DeleteAccessOnly");
     $status = [];
     if ($insertConn->connect_error || $deleteConn->connect_error) {
         $status['success'] = false;
@@ -336,7 +336,7 @@ function processRequest() {
 
 //isfar
 function getAccountIdByUsername($username) {
-    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect("BackEndAdmin");
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
@@ -356,6 +356,7 @@ function getAccountIdByUsername($username) {
 
 //isfar
 function calculateRateScoreAndLeaderboard() {
+    $connection = dbConnect("BackEndAdmin");
     if ($connection->connect_error) {
         die("Connection failed: " . $connection->connect_error);
     }
@@ -380,7 +381,7 @@ function calculateRateScoreAndLeaderboard() {
 
 
 function deleteFromWatchList($watchListID) {
-    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect("BackEndAdmin");
     $status = [];
     if ($conn->connect_error) {
         $status['success'] = false;
@@ -403,7 +404,7 @@ function deleteFromWatchList($watchListID) {
 }
 
 function insertReview($username, $MovieID, $movieTitle, $rating, $review, $MediaType){
-    $connection = dbConnect();
+    $connection = dbConnect("BackEndAdmin");
     $accountId = getAccountIdByUsername($username);
     $stmt = $connection->prepare("INSERT INTO Ratings(AccountID, MovieID, Movie, Rating, Review, MediaType) VALUES(?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ddsdss", $accountId, $MovieID, $movieTitle, $rating, $review, $MediaType);
@@ -418,7 +419,7 @@ function insertReview($username, $MovieID, $movieTitle, $rating, $review, $Media
 
 function searchRatingsByMovie($movieTitle){
     $result = [];
-    $connection = dbConnect();
+    $connection = dbConnect("BackEndAdmin");
     $stmt = $connection->prepare("SELECT AccountID, Movie, Rating, Review FROM Ratings WHERE Movie = ?");
     $stmt->bind_param("s", $movieTitle);
     $stmt->execute();
@@ -437,7 +438,7 @@ function searchRatingsByMovie($movieTitle){
     return (["returnCode" => '1', "reviews" => $result]);
 }
 function updateRateScore($username, $value) {
-    $mysqli = dbConnect();
+    $mysqli = dbConnect("BackEndAdmin");
     $accountID = getAccountIdByUsername($username);
     if (!$accountID) {
         return false;
@@ -455,7 +456,7 @@ function updateRateScore($username, $value) {
 
 //isfar
 function resetPassword($username, $email, $assword) {
-    $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect("BackEndAdmin");
     $query = "SELECT * FROM Users WHERE Username = ? AND Email = ?";
     $statement = $connection->prepare($query);
     if (!$statement) {
