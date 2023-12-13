@@ -171,6 +171,8 @@ function getWatchListData($username) {
                 'MovieTitle' => $row['Movie'],
                 'PosterURL' => $row['PosterURL'],
                 'Year' => $row['Year'],
+                'ListID' => $row['ListID],
+                'MediaType' => $row['MediaType'],
             );
         }
         $stmt->close();
@@ -201,6 +203,8 @@ function getWatchedListData($username) {
                 'MovieTitle' => $row['Movie'],
                 'PosterURL' => $row['PosterURL'],
                 'Year' => $row['Year'],
+                'ListID' => $row['ListID],
+                'MediaType' => $row['MediaType'],
             );
         }
         $stmt->close();
