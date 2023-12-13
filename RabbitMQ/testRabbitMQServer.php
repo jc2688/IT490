@@ -12,7 +12,7 @@ function processMessage($request)
 }
 
 try {
-    $server = new rabbitMQServer("testRabbitMQ.ini","api");
+    $server = new rabbitMQServer("testRabbitMQ.ini","test");
     $server->process_requests('processMessage');
 } catch (Exception $e) {
     error_log("Server error: " . $e->getMessage());

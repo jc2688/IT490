@@ -5,7 +5,7 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 
 try {
-    $client = new rabbitMQClient("testRabbitMQ.ini", "api");
+    $client = new rabbitMQClient("testRabbitMQ.ini", "test");
     $testMessage = ['type' => 'test', 'content' => 'Hello, server!'];
     $response = $client->send_request($testMessage);
     echo "Server response: " . json_encode($response) . "\n";
