@@ -1,13 +1,13 @@
 <?php
 function dbConnect($type) {
 	if ($type == "BackEndAdmin") {
-		$login = new mysqli("10.244.1.2", "BackEndAdmin", "Qg5OKQ!?\$Q", "SceneSync");
+		$login = new mysqli("10.244.1.5", "BackEndAdmin", "Qg5OKQ!?\$Q", "SceneSync");
 		
 		if ($login->connect_errno != 0) {
-			echo "Error connecting to database at 10.244.1.2 " . $login->connect_error . PHP_EOL;
+			echo "Error connecting to database at 10.244.1.5 " . $login->connect_error . PHP_EOL;
 			$login = new mysqli("10.244.1.5", "BackEndAdmin", "Qg5OKQ!?\$Q", "SceneSync");
 			if ($login->connect_errno != 0) {
-				echo "Error connecting to database at 10.244.1.5 \n " . $login->connect_error . PHP_EOL;
+				echo "Error connecting to database at 10.244.1.2 \n " . $login->connect_error . PHP_EOL;
 				echo "Database Cluster Down \n " . $login->connect_error . PHP_EOL;
 				exit(1);
 			}
@@ -20,9 +20,9 @@ function dbConnect($type) {
 		
 		if ($login->connect_errno != 0) {
 			echo "Error connecting to database at 10.244.1.5 " . $login->connect_error . PHP_EOL;
-			$login = new mysqli("10.244.1.5", "DeleteAccessOnly", "cl3v3rm@ndoesTh1ngs!", "SceneSync");
+			$login = new mysqli("10.244.1.2", "DeleteAccessOnly", "cl3v3rm@ndoesTh1ngs!", "SceneSync");
 			if ($login->connect_errno != 0) {
-				echo "Error connecting to database at 10.244.1.5 \n " . $login->connect_error . PHP_EOL;
+				echo "Error connecting to database at 10.244.1.2 \n " . $login->connect_error . PHP_EOL;
 				echo "Database Cluster Down \n " . $login->connect_error . PHP_EOL;
 				exit(1);
 			}
