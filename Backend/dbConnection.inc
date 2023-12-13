@@ -1,6 +1,6 @@
 <?php
 function dbConnect($type) {
-	if($type = "BackendAdmin") {
+	if($type = "BackEndAdmin") {
 		$login = new mysqli("10.244.1.2","BackEndAdmin","Qg5OKQ!?\$Q","SceneSync");
 		
 		if ($login -> connect_errno != 0) {
