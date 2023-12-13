@@ -1,7 +1,7 @@
 <?php
 function dbConnect($type) {
 	if($type = "BackEndAdmin") {
-		$login = new mysqli("10.244.1.2","BackEndAdmin","Qg5OKQ!?/$Q","SceneSync");
+		$login = new mysqli("10.244.1.2","BackEndAdmin","Qg5OKQ!?\$Q","SceneSync");
 		
 		if ($login -> connect_errno != 0) {
 			echo "Error connecting to database at 10.244.1.2 " . $this -> login -> connect_error . PHP_EOL;
