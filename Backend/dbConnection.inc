@@ -29,6 +29,6 @@ function dbConnect($type) {
 		}
 		echo "correctly connected to database" . PHP_EOL;
 		return $login;
-	
+	}	
 }
 ?>
