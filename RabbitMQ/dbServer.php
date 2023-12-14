@@ -9,8 +9,8 @@ require_once('../Backend/dbFunctions.inc');
 // Function to process incoming requests
 function requestProcessor($request) {
       // Print a message indicating the request received and show request details
-    echo "received request" . PHP_EOL; 
-    var_dump($request);
+      echo "received request from Backend Server" . PHP_EOL; 
+      var_dump($request);
 
     // Switch case to handle different types of requests based on the 'type' field
     switch ($request['type']) {
