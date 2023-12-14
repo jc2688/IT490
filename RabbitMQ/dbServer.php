@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-// Include required files for RabbitMQ connection and database-related functions
+// Include necessary files for RabbitMQ connection and database-related functions
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
