@@ -95,45 +95,9 @@ function recommendationActorDirector($username) {
         return array('error' => 'User preferences not found.');
     }
 }
-/*
-// This function takes one parameter $favoriteActor 
-function getMoviesByActor($favoriteActor) {
-    // Key used to connect to the movie database
-    global $apiKey;
-    // The actor's name is put in the API url  
-    $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($favoriteActor);
-    // A get request is made to the movie database the json response is held in $result
-    $response = file_get_contents($apiUrl);
-    $result = json_decode($response, true);
-    // This if statement will check if their was atleast one person. The person ID is taken. 
-    if ($result && isset($result['results'][0])) {
-        $personId = $result['results'][0]['id'];
-        $creditsUrl = "https://api.themoviedb.org/3/person/{$personId}/movie_credits?api_key={$apiKey}";
-        // Movie credits are found for the actor 
-        $creditsResponse = file_get_contents($creditsUrl);
-        $creditsResult = json_decode($creditsResponse, true);
-        // Goes through the cast and gets the credits 
-        if ($creditsResult && isset($creditsResult['cast'])) {
-            $recommendations = array();
-            foreach ($creditsResult['cast'] as $movie) {
-            // Title and Poster will be put in an array for the cast. If nobody is found an error message will be displayed and if succesful the recomendations will be displayed
-                $recommendations[] = array(
-                    'Title' => $movie['title'],
-                    'PosterURL' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500{$movie['poster_path']}" : 'Not available',
-                    'MovieID' => $movie['id'],
-                    'MediaType' => $mediaType,
-                );
-            }
-            return $recommendations;
-        } else {
-            return array('error' => 'Error retrieving movie credits.');
-        }
-    } else {
-        return array('error' => 'Actor not found.');
-    }
-}
-*/
 
+//isfar
+//for recomendation funciton, gets movies by actor
 function getMoviesByActor($favoriteActor) {
     // Key used to connect to the movie database
     global $apiKey;
@@ -180,49 +144,8 @@ function getMoviesByActor($favoriteActor) {
 }
 
 
-
-/*
-// This function takes the parameter $favoriteDirector  
-function getMoviesByDirector($favoriteDirector) {
-    // Connects to the movie database
-    global $apiKey;
-    $apiUrl = "https://api.themoviedb.org/3/search/person?api_key={$apiKey}&query=" . urlencode($favoriteDirector);
-    // A get request is made to the movie database 
-    $response = file_get_contents($apiUrl);
-    // Json is than decoded in $result 
-    $result = json_decode($response, true);
-    // Checks to see if there was atleast one person it then checks for the person ID
-    if ($result && isset($result['results'][0])) {
-        $personId = $result['results'][0]['id'];
-        // Another get request is made to get the credits for the director
-        $creditsUrl = "https://api.themoviedb.org/3/person/{$personId}/movie_credits?api_key={$apiKey}";
-        $creditsResponse = file_get_contents($creditsUrl);
-        $creditsResult = json_decode($creditsResponse, true);
-        // In the cast it will check for directors 
-        if ($creditsResult && isset($creditsResult['crew'])) {
-            $recommendations = array();
-            foreach ($creditsResult['crew'] as $movie) {
-                // if they are a director it will display reccomendations and will display the title and poster url 
-                if (isset($movie['job']) && $movie['job'] == 'Director') {
-                    $recommendations[] = array(
-                        'Title' => $movie['title'],
-                        'PosterURL' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500{$movie['poster_path']}" : 'Not available',
-                        'MovieID' => $movie['id'],
-                        'MediaType' => $mediaType,
-                    );
-                }
-            }
-            // Recomendations will be displayed and if there is none an error message displayed 
-            return $recommendations;
-        } else {
-            return array('error' => 'Error retrieving movie credits.');
-        }
-    } else {
-        return array('error' => 'Director not found.');
-    }
-}
-*/
-
+//isfar
+//for the recommendation function, gets movie recomendations by director
 function getMoviesByDirector($directorName) {
     global $apiKey;
     // API request to search for a person by the director's name
@@ -269,58 +192,8 @@ function getMoviesByDirector($directorName) {
 }
 
 
-
-/*
-// This function takes the parameter $username 
-function getMoviesByMovieAndGenre($username) {
-    // Key connects to the movie database
-    global $apiKey;
-    //  Connects to database using our credentials. 
-    $conn = dbConnect("BackEndAdmin"); //new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
-    // An empty arry is returned if there is a connection error. 
-    if ($conn->connect_error) {
-        return [];
-    }
-    // gets the account id with the username
-    $accountId = getAccountIdByUsername($username);
-    // Favorite genre and movie is taken with the account id
-    $sql = "SELECT FavoriteGenres, FavoriteMovie FROM Profiles WHERE AccountID = '$accountId'";
-    $result = $conn->query($sql);
-    // Checks if anything was found with the profile 
-    if ($result->num_rows > 0) {
-        $profileData = $result->fetch_assoc();
-        $favoriteGenre = $profileData['FavoriteGenres'];
-        $favoriteMovie = $profileData['FavoriteMovie'];
-        // Finding the movies by genre with the api request 
-        $tmdbApiUrl = 'https://api.themoviedb.org/3/';
-        $tmdbDiscoverEndpoint = 'discover/movie';
-        $apiEndpoint = $tmdbApiUrl . $tmdbDiscoverEndpoint . '?api_key=' . $apiKey . '&with_genres=' . urlencode($favoriteGenre);
-        $apiResponse = file_get_contents($apiEndpoint);
-        // If the api request has an error it will return false
-        if ($apiResponse === false) {
-            return [];
-        }
-        // Api response is decoded and the title, overview, and release date is returned 
-        $moviesData = json_decode($apiResponse, true);
-        $recommendedMovies = array_map(function ($movie) {
-            return [
-                'title' => $movie['title'],
-                'overview' => $movie['overview'],
-                'release_date' => $movie['release_date'],
-                'poster_path' => isset($movie['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $movie['poster_path'] : 'Not available',
-                'MovieID' => $movie['id'],
-                'MediaType' => $mediaType,
-            ];
-        // There could be ten results that are recommended 
-        }, $moviesData['results']);
-        return array_slice($recommendedMovies, 0, 10);
-    // If nothing is found an empty array is displayed 
-    } else {
-        return [];
-    }
-}
-*/
-
+//isfar
+//recomendation by fav movie and fav genre
 function getMoviesByMovieAndGenre($username) {
     // Key connects to the movie database
     global $apiKey;
@@ -373,7 +246,7 @@ function getMoviesByMovieAndGenre($username) {
 
 
 
-
+//isfar
 // This function takes the parameter $username 
 function getAccountIdByUsername($username) {
     // This will connect to our databse using our credentials. If there is an error, a message is displayed 
@@ -399,6 +272,7 @@ function getAccountIdByUsername($username) {
 }
 
 //isfar
+//gets movie details by id
 function getMoviesByDetails($movieId) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/movie/{$movieId}?api_key={$apiKey}";
@@ -467,6 +341,7 @@ function getRecentWatchedRecommendations($username) {
 }
 
 //isfar
+//for recomendation function, if no recent watched, shows ppopular movies
 function getPopularRecommendations() {
     global $apiKey;
     $apiEndpoint = 'https://api.themoviedb.org/3/movie/popular';
@@ -571,7 +446,8 @@ function getMostRecentWatched($username) {
 }
 
 
-
+//isfar
+//finds streaming providers for defined movie id
 function getWatchProvidersMovie($movieId) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/movie/{$movieId}/watch/providers";
@@ -591,6 +467,8 @@ function getWatchProvidersMovie($movieId) {
     }
 }
 
+//isfar
+//finds streaming providers for defined tv id
 function getWatchProvidersTV($movieId) {
     global $apiKey;
     $apiUrl = "https://api.themoviedb.org/3/tv/{$mediaId}/watch/providers";
@@ -610,6 +488,8 @@ function getWatchProvidersTV($movieId) {
     }
 }
 
+//isfar
+//gets details for tv show by id
 function getTVByDetails($movieId) {
     global $apiKey;
     $watchProviders = getWatchProvidersTV($movieId);
