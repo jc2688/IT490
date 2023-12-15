@@ -30,6 +30,7 @@ switch ($request['type']) {
     case "getLeaderboard":
     case "insertReview":
     case "deleteFromWatchList":
+    case "deleteFromWatchedList":
     case "addToWatchedListAndRemoveFromWatchList":
         $response = $dbClient->send_request($request);
         break;
