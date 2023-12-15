@@ -5,15 +5,20 @@ error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
 //isfar + Sean
+//ensures users can login to the website
 function validateLogin($username, $password) {
     echo "Starting validation" . PHP_EOL;
+    //connects to database
     $database = dbConnect();
     echo "Database connected" . PHP_EOL;
+    //sanitizes username and password field
     $sanitizedUsername = $database->real_escape_string($username);
     $sanitizedPassword = $database->real_escape_string($password);
+    //SQL statement finds account where username is correct
     $query = "SELECT * FROM Accounts WHERE Username = '$sanitizedUsername'";
     echo "Executing query: $query" . PHP_EOL;
     $result = $database->query($query);
+    //checks and returns if any incorrect user or passwd
     $usernameFound = false;
     $startTime = microtime(true);
     while ($row = $result->fetch_assoc()) {
@@ -46,7 +51,9 @@ function validateLogin($username, $password) {
 
 //isfar
 function validateRegister($firstname, $lastname, $username, $email, $address, $city, $country, $zipcode, $password) {
+    //connects to db
     $database = dbConnect();
+    //sanitize alll fields
     $sanitizedFirstname = $database->real_escape_string($firstname);
     $sanitizedLastname = $database->real_escape_string($lastname);
     $sanitizedUsername = $database->real_escape_string($username);
@@ -56,9 +63,9 @@ function validateRegister($firstname, $lastname, $username, $email, $address, $c
     $sanitizedCountry= $database->real_escape_string($country);
     $sanitizedZipcode = $database->real_escape_string($zipcode);
     $sanitizedPassword= $database->real_escape_string($password);
+    //sql statement to check if username exists
     $query = "SELECT * FROM Accounts WHERE Username = '$sanitizedUsername'";
     $result = $database->query($query);
-
     while ($row = $result->fetch_assoc()) {
         if ($row["Username"] == $sanitizedUsername) {
             return array("returnCode" => '0', "message" => "Username already exists, try again");
@@ -67,6 +74,7 @@ function validateRegister($firstname, $lastname, $username, $email, $address, $c
             return array("returnCode" => '0', 'message'=>"Email already exists, try again");
         }
     }
+    //inserts the data into the db
     $insertQuery = "INSERT INTO Accounts (FirstName, LastName, Username, Email, Address, City, Country, ZipCode, PasswordHash) VALUES ('$sanitizedFirstname', '$sanitizedLastname', '$sanitizedUsername', '$sanitizedEmail', '$sanitizedAddress', '$sanitizedCity', '$sanitizedCountry', '$sanitizedZipcode', '$sanitizedPassword')";
     if ($database->query($insertQuery) === TRUE) {
         return (array("returnCode" => '1', 'message' => "Username and password accepted"));
@@ -75,7 +83,9 @@ function validateRegister($firstname, $lastname, $username, $email, $address, $c
 }
 
 //isfar
+//adss user preferences to db
 function validatePreferences($username, $favoriteActor, $favoriteDirector, $favoriteMovie, $favoriteGenre, $biography){
+    //gets account id via function
     $accountID = getAccountIdByUsername($username);
     if (!$accountID) {
         return array('error' => 'Username not found.');
@@ -98,6 +108,7 @@ function validatePreferences($username, $favoriteActor, $favoriteDirector, $favo
 }
 
 //isfar
+//gets user's profile data
 function getUserProfileData($username) {
     $mysqli = dbConnect();
     $accountID = getAccountIdByUsername($username);
@@ -127,29 +138,27 @@ function getUserProfileData($username) {
 }
 
 //isfar
+//updates profile settings
 function updateProfileSettings($username, $favActor, $favGenre, $favDirector, $favMovie, $biography) {
     $mysqli = dbConnect();
     $AccountId = getAccountIdByUsername($username);
     $updateQuery = "UPDATE Profiles SET FavoriteDirector = ?, FavoriteGenres = ?, FavoriteMovie = ?, FavoriteActor = ?, Biography = ? WHERE AccountID = ?";
-    
     if ($updateStmt = $mysqli->prepare($updateQuery)) {
         // Use $AccountId instead of $AccountID in bind_param
         $updateStmt->bind_param("sssssi", $favDirector, $favGenre, $favMovie, $favActor, $biography, $AccountId);
-        
         if ($updateStmt->execute()) {
             $updateStmt->close();
             $mysqli->close();
             return ["status" => 200, "message" => "Settings updated successfully"];
         }
-        
         $updateStmt->close();
     }
-    
     $mysqli->close();
     return ["status" => 500, "message" => "Failed to update settings"];
 }
 
 //isfar
+//gets a user's watch list data
 function getWatchListData($username) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
@@ -182,6 +191,7 @@ function getWatchListData($username) {
 }
 
 //isfar
+//gets user's watched list data
 function getWatchedListData($username) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
@@ -214,6 +224,7 @@ function getWatchedListData($username) {
 }
 
 //isfar
+//adds move or tv show to watch list
 function addToWatchList($username, $MovieID, $movieTitle, $posterURL, $year, $mediatype) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
@@ -243,6 +254,7 @@ function addToWatchList($username, $MovieID, $movieTitle, $posterURL, $year, $me
 }
 
 //isfar
+//addes movie or tv show to user's watched list
 function addToWatchedList($username, $MovieID, $movieTitle, $posterURL, $year, $mediatype) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
@@ -272,6 +284,7 @@ function addToWatchedList($username, $MovieID, $movieTitle, $posterURL, $year, $
 }
 
 //isfar
+//when moving media to wached list from watch list ie marking something as watched
 function addToWatchedListAndRemoveFromWatchList($username, $MovieID, $movieTitle, $posterURL, $year, $mediatype) {
     $accountId = getAccountIdByUsername($username);
     if (!$accountId) {
@@ -313,32 +326,7 @@ function addToWatchedListAndRemoveFromWatchList($username, $MovieID, $movieTitle
 }
 
 //isfar
-function handlePostRequest() {
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (!empty($data) && isset($data['session_id'])) {
-        $sessionID = $data['session_id'];
-        $result = updateProfileSettings($sessionID, $data);
-        http_response_code($result['status']);
-        echo json_encode(["message" => $result['message']]);
-        exit;
-    }
-    echo "Invalid or missing data."; 
-}
-
-function handleInvalidRequestMethod() {
-    echo "Invalid request method."; 
-}
-function processRequest() {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        handlePostRequest();
-    } else {
-        handleInvalidRequestMethod();
-    }
-    $mysqli = dbConnect();
-    $mysqli->close(); 
-}
-
-//isfar
+//gets account id from database via username
 function getAccountIdByUsername($username) {
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
     if ($conn->connect_error) {
@@ -359,6 +347,7 @@ function getAccountIdByUsername($username) {
 }
 
 //isfar
+//shows leaderboard scores
 function calculateRateScoreAndLeaderboard() {
     if ($connection->connect_error) {
         die("Connection failed: " . $connection->connect_error);
@@ -381,8 +370,8 @@ function calculateRateScoreAndLeaderboard() {
 }
 
 
-
-
+//isfar
+//deletes movie or tv show from watch list
 function deleteFromWatchList($watchListID) {
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
     $status = [];
@@ -406,6 +395,7 @@ function deleteFromWatchList($watchListID) {
     return $status;
 }
 
+//insert's a user's review into db
 function insertReview($username, $MovieID, $movieTitle, $rating, $review, $MediaType){
     $connection = dbConnect();
     $accountId = getAccountIdByUsername($username);
@@ -420,6 +410,7 @@ function insertReview($username, $MovieID, $movieTitle, $rating, $review, $Media
 
 }
 
+//???? idk USMAN DO THIS ONE
 function searchRatingsByMovie($movieTitle){
     $result = [];
     $connection = dbConnect();
@@ -440,6 +431,8 @@ function searchRatingsByMovie($movieTitle){
     http_response_code(200);
     return (["returnCode" => '1', "reviews" => $result]);
 }
+
+//updates a user's rate score after they submit a review
 function updateRateScore($username, $value) {
     $mysqli = dbConnect();
     $accountID = getAccountIdByUsername($username);
@@ -457,7 +450,9 @@ function updateRateScore($username, $value) {
     }
     return false;
 }
+
 //isfar
+//resets a user's password if they forgot their password
 function resetPassword($username, $email, $password) {
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
     if ($conn->connect_error) {
