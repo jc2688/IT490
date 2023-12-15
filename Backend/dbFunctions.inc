@@ -456,7 +456,7 @@ function updateRateScore($username, $value) {
         return true;
     }
     return false;
-
+}
 //isfar
 function resetPassword($username, $email, $password) {
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
