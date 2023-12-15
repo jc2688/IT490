@@ -458,36 +458,43 @@ function updateRateScore($username, $value) {
     return false;
 
 //isfar
-function resetPassword($username, $email, $assword) {
+function resetPassword($username, $email, $password) {
     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    if ($conn->connect_error) {
+        return ['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error];
+    }
     $query = "SELECT * FROM Users WHERE Username = ? AND Email = ?";
-    $statement = $connection->prepare($query);
+    $statement = $conn->prepare($query);
     if (!$statement) {
-        return ['success' => false, 'message' => 'Error in query preparation: ' . $connection->error];
+        return ['success' => false, 'message' => 'Error in query preparation: ' . $conn->error];
     }
     $statement->bind_param('ss', $username, $email);
     $statement->execute();
     $result = $statement->get_result();
     if ($result->num_rows == 0) {
+        $statement->close();
+        $conn->close();
         return ['success' => false, 'message' => 'Invalid username or email.'];
     }
-//JAKEEEEEEE DO STUFF HERE
     $updateQuery = "UPDATE Users SET Password = ? WHERE Username = ?";
-    $updateStatement = $connection->prepare($updateQuery);
+    $updateStatement = $conn->prepare($updateQuery);
     if (!$updateStatement) {
-        return ['success' => false, 'message' => 'Error in query preparation: ' . $connection->error];
+        $statement->close();
+        $conn->close();
+        return ['success' => false, 'message' => 'Error in query preparation: ' . $conn->error];
     }
     $updateStatement->bind_param('ss', $password, $username);
     $updateResult = $updateStatement->execute();
+    $statement->close();
+    $updateStatement->close();
+    $conn->close();
     if ($updateResult) {
         return ['success' => true, 'message' => 'Password reset successfully.'];
     } else {
         return ['success' => false, 'message' => 'Error resetting password: ' . $updateStatement->error];
     }
-    $statement->close();
-    $updateStatement->close();
-    $result->close();
 }
 
-}
+
+
 ?>
