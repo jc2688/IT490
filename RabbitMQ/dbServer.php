@@ -84,6 +84,11 @@ function requestProcessor($request) {
             echo "deleting from watch list\n";
             return deleteFromWatchList($request['watchListID']);
         
+        // Handle deletion of a movie from the watch list
+        case "deleteFromWatchedList":
+            echo "deleting from watched list\n";
+            return deleteFromWatchedList($request['watchedListID']);
+        
         // Handle adding to watched list and removing from watch list
         case "addToWatchedListAndRemoveFromWatchList":
             echo "adding to watched list and removing from watch list\n";
