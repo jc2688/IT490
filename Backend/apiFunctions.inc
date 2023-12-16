@@ -71,7 +71,7 @@ function recommendationActorDirector($username) {
         return array('error' => 'Username not found.');
     }
     // This will connect to our database using our credentials. If the connection fails it will display a message 
-    $conn = dbConnect("BackEndAdmin"); //new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect();
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
@@ -198,7 +198,7 @@ function getMoviesByMovieAndGenre($username) {
     // Key connects to the movie database
     global $apiKey;
     //  Connects to the database using our credentials. 
-    $conn = dbConnect("BackEndAdmin");//new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect();
     // An empty array is returned if there is a connection error. 
     if ($conn->connect_error) {
         return [];
@@ -250,7 +250,7 @@ function getMoviesByMovieAndGenre($username) {
 // This function takes the parameter $username 
 function getAccountIdByUsername($username) {
     // This will connect to our databse using our credentials. If there is an error, a message is displayed 
-    $conn = dbConnect("BackEndAdmin"); //new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect();
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
@@ -414,7 +414,7 @@ function getMostRecentWatched($username) {
         return array('error' => 'Username not found.');
     }
     // Connects to our database using our credentials. 
-    $conn = dbConnect("BackEndAdmin"); //new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect();
     // An error message is displayed if the connection gets displayed. 
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
