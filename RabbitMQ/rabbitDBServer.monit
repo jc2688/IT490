@@ -1,5 +1,4 @@
 check process rabbitDBServer with pidfile /var/run/rabbitDBServer.pid
     start program = "/bin/systemctl start rabbitDBServer"
     stop program  = "/bin/systemctl stop rabbitDBServer"
-    if failed port 5672 protocol amqp then restart
     if 5 restarts within 5 cycles then timeout
