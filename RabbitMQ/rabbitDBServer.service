@@ -1,0 +1,13 @@
+[Unit]
+Description=Rabbit DB server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/vboxuser/IT490/RabbitMQ/dbServer.php
+Restart=always
+User=vboxuser
+WorkingDirectory=/home/vboxuser/IT490/RabbitMQ
+
+[Install]
+WantedBy=multi-user.target
