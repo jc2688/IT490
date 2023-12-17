@@ -387,7 +387,7 @@ function getPopularRecommendations() {
         foreach ($popularMovies as $movie) {
             $formattedMovies[] = [
                 'title' => $movie['title'],
-                'poster_path' => $movie['poster_path'],
+                'poster_path' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
             ];
         }
         return $formattedMovies;
