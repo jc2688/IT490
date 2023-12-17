@@ -1,0 +1,4 @@
+check process rabbitBEServer with pidfile /var/run/rabbitBEServer.pid
+    start program = "/sbin/start rabbitBEServer"
+    stop program  = "/sbin/stop rabbitBEServer"
+    if 4 restarts within 20 cycles then timeout
