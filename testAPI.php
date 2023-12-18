@@ -3,23 +3,15 @@
 $apiKey = 'ab0f6b84bbcbbd4066f4fee3eaba248c';
 
 
+// Function to get popular recommendations from the TMDB API
 function getPopularRecommendations() {
     global $apiKey; // Use the global API key variable
     
     // Make a request to TMDB API for popular recommendations
     $url = "https://api.themoviedb.org/3/trending/all/day?api_key={$apiKey}";
 
-    // Initialize cURL session
-    $ch = curl_init($url);
-
-    // Set cURL options
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    // Execute cURL session and get the response
-    $response = curl_exec($ch);
-
-    // Close cURL session
-    curl_close($ch);
+    // Use file_get_contents to make the request
+    $response = file_get_contents($url);
 
     // Decode the JSON response
     $data = json_decode($response, true);
@@ -52,17 +44,8 @@ function getRecommendationByMovieId($movieId, $mediaType) {
     // Make a request to TMDB API for movie recommendations
     $url = "https://api.themoviedb.org/3/{$mediaType}/{$movieId}/recommendations?api_key={$apiKey}&language=en-US&page=1";
 
-    // Initialize cURL session
-    $ch = curl_init($url);
-
-    // Set cURL options
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    // Execute cURL session and get the response
-    $response = curl_exec($ch);
-
-    // Close cURL session
-    curl_close($ch);
+    // Use file_get_contents to make the request
+    $response = file_get_contents($url);
 
     // Decode the JSON response
     $data = json_decode($response, true);
@@ -125,28 +108,6 @@ function getRecentWatchedRecommendations($username) {
     $recommendation = getRecommendationByMovieId($movieId, $mediaType);
 
     return $recommendation;
-}
-function getAccountIdByUsername($username) {
-    // This will connect to our databse using our credentials. If there is an error, a message is displayed 
-    $conn =  dbConnect();
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    $username = $conn->real_escape_string($username);
-    // Account ID is associated with the username 
-    $sql = "SELECT AccountID FROM Accounts WHERE Username = '$username'";
-    $result = $conn->query($sql);
-    // If the user name was found it gets the account ID 
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $accountId = $row['AccountID'];
-        $conn->close();
-        return $accountId;
-    // If the username was not found the database connection is closed and returns false
-    } else {
-        $conn->close();
-        return false;
-    }
 }
 
 
