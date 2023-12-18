@@ -2,20 +2,99 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Scene Sync Home</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #2980b9; /* Updated to a darker blue background color */
+            color: #fff; /* Updated text color to white */
+        }
+
+        #navbar-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        #welcomeMessage {
+            background-color: #3498db; /* Dark blue background color */
+            text-align: center;
+            padding: 10px;
+        }
+
+        .search-bar {
+            background-color: #2980b9;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .search-input {
+            padding: 8px;
+            margin-right: 5px;
+            font-size: 20px; /* Increased font size for better readability */
+        }
+
+        #search-button {
+            padding: 14px; /* Increased padding for a larger button */
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #search-results {
+            margin-top: 10px;
+        }
+
+       
+
+        .result-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            background-color: #2980b9;
+            padding: 20px; /* Increased padding for better spacing */
+            border-radius: 5px;
+            color: #fff; /* Set text color to white */
+            font-size: 18px; /* Adjusted font size */
+        }
+
+        .poster-image {
+            width: 120px; /* Increased width for larger images */
+            margin-right: 15px; /* Increased margin for better spacing */
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <br>
     
+    
+    <div id="navbar-container"></div>
+
     <div id="welcomeMessage"></div>
 
+   
+
+    <!-- container for navbar for independet stylizing -->
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search for movies Here!" class="search-input">
+        <button id="search-button">Search</button>
+        <div id="search-results"></div>
+    </div>
+
     <script>
-        const sessionid = ('; ' + document.cookie).split('; sessionid=').pop().split(';')[0];
-        const username = ('; ' + document.cookie).split('; username=').pop().split(';')[0];
+        // Retrieve session information from sessionStorage
+        const sessionid = sessionStorage.getItem('sessionid');
+        const username = sessionStorage.getItem('username');
+
+        if (!sessionid || !username) {
+            // Redirect to the login page if session information is not found (safety check to insure pur pages can't be randomly accessed)
+            location.href = "index.html";
+        }
+
         console.log(sessionid);
         console.log(username);
+
         let sessionData = {
             sessionid: sessionid
         };
@@ -31,7 +110,9 @@
                 dataType: 'json',
                 success: function (result) {
                     if (result.returnCode != "1") {
-                        document.cookie = "sessionid=;username=;path='/'";
+                        // can be used to validate the session of the servers can be configured that way 
+                        sessionStorage.removeItem('sessionid');
+                        sessionStorage.removeItem('username');
                         location.href = "index.html";
                     }
                 },
@@ -55,8 +136,9 @@
                 method: 'POST',
                 data: sessionData,
                 success: function () {
-                    document.cookie = "sessionid=;path='/'";
-                    document.cookie = "username=;path='/'";
+                    // replaced by the logout and prfile functions in the navbar but i am scared of breaking things 
+                    sessionStorage.removeItem('sessionid');
+                    sessionStorage.removeItem('username');
                     location.href = "index.html";
                 },
                 error: function () {
@@ -69,8 +151,93 @@
             let welcomeMessage = document.getElementById("welcomeMessage");
             welcomeMessage.innerHTML = `Welcome, ${username} to Scene Sync! Try and find some movies you'd like based on ur preferences.`;
         }
+// a welcome message for the page that we can easily drag around and stylize independently
 
-        setWelcomeMessage();
+
+        // Fetches and imports the navbar component
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+                setWelcomeMessage();
+            })
+            .catch(error => console.error(error));
+
+        // defines the search movie function
+        function searchMovies() {
+            let query = $('#search-input').val();
+
+            // The ajax request to send the query to apiconsumer
+            $.ajax({
+                url: 'RabbitMQ/apiConsumer.php',
+                method: 'POST',
+                data: {
+                    type: 'searchMoviesAndTVShows',
+                    query: query
+                },
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);
+                    displayResults(response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(errorThrown);
+                    // where error handeling occurs
+                }
+            });
+            
+            // Adds the "Type" field to the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('Type', 'searchMoviesAndTVShows');
+            history.replaceState(null, null, '?' + urlParams.toString());
+        }
+
+        function displayResults(results) {
+            let searchResultsDiv = $('#search-results');
+            searchResultsDiv.empty();
+
+            results.forEach(function (item) {
+                let title = item['Title'];
+                let movieID = item['ID'];
+                let Type = item['Type'];
+                let posterURL = item['PosterURL'];
+
+                // Adds the "Type" parameter to the URL
+                const urlParams = new URLSearchParams();
+                urlParams.set('movieID', movieID);
+                urlParams.set('Type', Type);
+                let resultContainer = $('<div>').addClass('result-container');
+
+                // Creates an image element for the poster
+                let posterImage = $('<img>')
+                    .attr('src', posterURL)
+                    .attr('alt', 'Movie Poster')
+                    .on('error', function () {
+                        $(this).attr('src', 'not-found.jpg'); // Set a default image if the poster fails to load
+                    })
+                    .addClass('poster-image');
+
+                    let titleLink = $('<a>')
+                        .text(title)
+                        .attr('href', 'movie.html?' + urlParams.toString())
+                        .css('color', '#fff'); // Set the color to white
+
+
+                // Appends all of the elements to the result container
+                resultContainer.append(posterImage).append(titleLink);
+
+                // Appends the result container to the final searchResultsDiv
+                searchResultsDiv.append(resultContainer).append('<br>');
+            });
+        }
+
+
+        // The event listener for the search button click
+        $(document).ready(function () {
+            $('#search-button').click(function () {
+                searchMovies();
+            });
+        });
     </script>
 </body>
 </html>

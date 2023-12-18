@@ -4,9 +4,12 @@
     <meta charset="utf-8">
     <title>Register</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <a href="index.html">Back to Login</a>
+    
     <div id="navigation"></div>
     
     <div id="error"></div>
@@ -63,25 +66,36 @@
         form.on("submit", async function (event) {
             event.preventDefault();
 
-            let formData = new FormData(form[0]);
-            formData.append("type", "register");
-            console.log("Trying registration");
+            let formData = {
+                type: "register",
+                firstname: $("#firstname").val(),
+                lastname: $("#lastname").val(),
+                username: $("#username").val(),
+                email: $("#email").val(),
+                address: $("#address").val(),
+                city: $("#city").val(),
+                country: $("#country").val(),
+                zipcode: $("#zipcode").val(),
+                password: CryptoJS.SHA256($("#password").val()).toString(CryptoJS.enc.Hex)
+            };
 
             try {
                 let response = await $.ajax({
-                    url: 'userRegistration.php',
+                    url: 'RabbitMQ/dbConsumer.php', 
                     method: "POST",
                     data: formData,
-                    processData: false,
-                    contentType: false,
                     dataType: 'json'
                 });
-
+            
                 console.log(response);
-                showMessage(response.message, response.returnCode == "1" ? "success" : "error");
 
-                if (response.returnCode == "1") {
-                    location.href = "index.html";
+                // Check the returnCode even if it's in quotes (we were having double encode problems)
+                showMessage(response.message, response.returnCode === "1" || response.returnCode === 1 || response["returnCode"] === "1" || response["returnCode"] === 1 ? "success" : "error");
+
+                if (response.returnCode === "1" || response.returnCode === 1 || response["returnCode"] === "1" || response["returnCode"] === 1) {
+                    // Set the username in session storage
+                    sessionStorage.setItem('username', formData.username);
+                    window.location.href = "newProfile.html";
                 }
             } catch (error) {
                 showMessage(error.message, "error");
@@ -94,3 +108,8 @@
     </script>
 </body>
 </html>
+
+
+
+
+

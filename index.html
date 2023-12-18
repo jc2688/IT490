@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Login</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 </head>
 <body>    
     <div id="failure"></div>
@@ -24,16 +25,38 @@
             <button type="button" onclick="validate()" name="submit" id="submit">Submit</button>
         </form>
         <p>Don't have an account? <a href="register.html">Register here</a>.</p>
+        <p><a href="passwordReset.html">Forgot Password?</a></p>
     </div>
+    
     <script>
+        function generateSessionId() {
+            // This function is used to set the session ID
+            return 'session_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function storeSessionInformation(uname, sessionid) {
+            // I use this to store the data in session storage
+            sessionStorage.setItem('sessionid', sessionid);
+            sessionStorage.setItem('username', uname);
+        }
+
         function validate() {
             let formData = new FormData($("#login")[0]);
             formData.append("type", "login");
             let uname = formData.get("username");
+            let password = formData.get("password");
+
+            // Where we hash the password using SHA-256
+            let hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+
+            formData.set("password", hashedPassword); // Replaces the original password in the form with a hashed password
+
             console.log("Logging in");
-    
+            
+            //ajax call to send form data to log in method through rabbitMQ
+
             $.ajax({
-                url: 'userValidate.php',
+                url: 'RabbitMQ/dbConsumer.php',
                 method: "POST",
                 data: formData,
                 processData: false,
@@ -41,9 +64,19 @@
                 dataType: 'json',
                 success: function(result) {
                     console.log(result);
+                    var data = JSON.parse(result);
     
-                    if (result.returnCode == "1") {
+                    if (data.returnCode == "1") {
                         console.log("Login successful");
+                        
+                        // Uses a returned session ID 
+                        let sessionid = result.sessionid;
+
+                        storeSessionInformation(uname, sessionid);
+
+                        document.cookie = "sessionid=" + encodeURIComponent(sessionid) + ";path='/';SameSite=Lax;";
+                        document.cookie = "username=" + uname;
+
                         console.log("Redirecting to home.html");
                         location.href = "home.html";
                     }
@@ -55,7 +88,7 @@
                 }
             });
         }
-    
+//shows an alert if there is a problem at all
         function showMessage(message) {
             $("#failure").html("<div class='alert alert-error'>" + message + "</div>");
         }

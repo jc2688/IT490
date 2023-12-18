@@ -1,0 +1,54 @@
+<!-- components/search-bar-component.html -->
+<div class="search-bar">
+  <input type="text" id="search-input" placeholder="Search for movies Here!" class="search-input">
+  <button id="search-button">Search</button>
+  <div id="search-results"></div>
+</div>
+
+<script>
+  // Define a searchMovies function to call 
+  function searchMovies() {
+      let query = $('#search-input').val();
+
+      // Makes an AJAX request to the APIConsumer
+      $.ajax({
+          url: 'RabbitMQ/apiConsumer.php',
+          method: 'POST',
+          data: {
+              type: 'searchMoviesAndTVShows',
+              query: query
+          },
+          dataType: 'json',
+          success: function(response) {
+              // Handles the API responses and display the results as hyperlinks
+              console.log(response); 
+              displayResults(response);
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+              console.error(errorThrown);
+              // Handle errors here
+          }
+      });
+  }
+
+  function displayResults(results) {
+      let searchResultsDiv = $('#search-results');
+      searchResultsDiv.empty(); // Clear previous results
+
+      // Loop through each item in the results array and create hyperlinks for titles
+      results.forEach(function(item) {
+          let title = item['Title'];
+          let titleLink = $('<a>').text(title).attr('href', '#'); // where the actual url is set
+
+          // Append the title hyperlink to the search results div
+          searchResultsDiv.append(titleLink).append('<br>');
+      });
+  }
+
+  // Add an event listener for the search button click
+  $(document).ready(function() {
+      $('#search-button').click(function() {
+          searchMovies();
+      });
+  });
+</script>
