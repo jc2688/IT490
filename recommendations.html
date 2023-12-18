@@ -111,9 +111,9 @@
                 },
                 dataType: 'json',
                 success: function (response) {
-                    displayRecommendations('movies-by-genre-container', 'Movies by Genre Recommendations', response);
+                    displayRecommendations('movies-by-genre-container', 'Popular Recommendations', response);
                 },
-                error: handle500Error('movies-by-genre-container', 'Movies by Genre Recommendations')
+                error: handle500Error('movies-by-genre-container', 'Popular Recommendations')
             });
         }
 
