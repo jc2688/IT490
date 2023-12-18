@@ -219,7 +219,7 @@
                     dataType: 'json',
                     data: {
                         "type": "getMediaDetails",
-                        "movieID": Number(mediaID),
+                        "movieID": parseInt(mediaID, 10),
                         "mediaType": mediaType,
                     },
                     success: function (result) {
