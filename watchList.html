@@ -214,6 +214,13 @@
         }
 
         function moveToWatchedList(movieId, movieTitle, posterURL, year, mediaType) {
+            console.log('Type of movieId before conversion:', typeof movieId);
+
+            // Try converting to a number
+            movieId = Number(movieId);
+            console.log('Type of movieId after conversion:', typeof movieId);
+
+
             $.ajax({
                 url: 'RabbitMQ/dbConsumer.php',
                 method: 'POST',
