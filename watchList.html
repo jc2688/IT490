@@ -229,6 +229,7 @@
                 dataType: 'json',
                 success: function (response) {
                     console.log('Movie moved to the watched list:', response);
+                    console.log('Type of movieId after conversion:', typeof movieId);
                     // Refresh the watchlist after moving a movie
                     getWatchlist(sessionStorage.getItem('username'));
                 },

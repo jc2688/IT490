@@ -145,6 +145,7 @@
                 },
                 success: function () {
                     console.log(`Media added to watch list: ${mediaRequest[mediaType === 'movie' ? 'Title' : 'name']}`);
+                    console.log('Type of movieId after conversion:', typeof mediaId);
                 },
                 error: function () {
                     console.log("Error adding media to watch list");
@@ -167,6 +168,7 @@
                 },
                 success: function () {
                     console.log(`Media added to watched list: ${mediaRequest[mediaType === 'movie' ? 'Title' : 'name']}`);
+                    console.log('Type of movieId after conversion:', typeof mediaId);
                 },
                 error: function () {
                     console.log("Error adding media to watched list");
