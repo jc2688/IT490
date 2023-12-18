@@ -220,7 +220,7 @@
                 data: {
                     type: 'addToWatchedListAndRemoveFromWatchList',
                     username: sessionStorage.getItem('username'),
-                    MovieID: parseInt(movieId, 10),
+                    MovieID: Number(movieId),
                     movieTitle: movieTitle,
                     posterURL: posterURL,
                     year: year,
