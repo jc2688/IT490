@@ -218,7 +218,7 @@
 
             // Try converting to a number
             movieId = Number(movieId);
-            console.log('Type of movieId after conversion:', typeof movieId);
+            console.log('Type of movieId after conversion second:', typeof movieId);
 
 
             $.ajax({
@@ -236,12 +236,13 @@
                 dataType: 'json',
                 success: function (response) {
                     console.log('Movie moved to the watched list:', response);
-                    console.log('Type of movieId after conversion:', typeof movieId);
+                    console.log('Type of movieId after conversion final:', typeof movieId);
                     // Refresh the watchlist after moving a movie
                     getWatchlist(sessionStorage.getItem('username'));
                 },
                 error: function (error) {
                     console.error('Error moving a movie to the watched list:', error);
+                    console.log('Type of movieId after conversion final broken:', typeof movieId);
                 }
             });
         }
