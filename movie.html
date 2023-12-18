@@ -206,10 +206,11 @@
         function loadMediaInfo() {
             console.log("load media info is starting");
             const urlParams = new URLSearchParams(window.location.search);
-            mediaID = urlParams.get('movieID');
+            mediaIDString = urlParams.get('movieID');
+            mediaID = mediaIDString ? parseInt(mediaIDString, 10) : null;
             mediaType = urlParams.get('Type');
 
-            if (mediaID && mediaType) {
+            if (mediaID !== null && mediaType) {
                 console.log("Media ID and Type found:", mediaID, mediaType);
 
                 $.ajax({
@@ -222,6 +223,7 @@
                         "mediaType": mediaType,
                     },
                     success: function (result) {
+                        console.log('Type of mediaID after conversion:', typeof mediaID);
                         if (result) {
                             console.log("API Result:", result);
                             mediaRequest = result;
