@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .movie-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            margin-bottom: 10px;
+        }
+
+        .movie-block {
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            padding: 10px;
+            width: 250px; /* Adjust the width as needed */
+            cursor: pointer;
+        }
+
+        .movie-image {
+            width: 100%;
+            height: 350px; /* Set a fixed height for all images */
+            object-fit: cover; /* Maintain aspect ratio and cover the entire space */
+        }
+
+        .movie-details {
+            text-align: center;
+        }
+
+        .movie-title {
+            margin: 5px 0;
+        }
+
+
+    </style>
+    
+</head>
+<body>
+    
+    
+
+    
+
+    <div id="navbar-container"></div>
+
+    <div id="movies-by-genre-container">
+        <!-- Display movies by genre recommendations here -->
+    </div>
+
+
+    <div id="recent-watched-container">
+        <!-- Display recent watched recommendations here -->
+    </div>
+
+    <div id="actor-director-container">
+        <!-- Display actor/director recommendations here -->
+    </div>
+
+    <script>
+
+        
+        function loadNavbar() {
+            const navbarContainer = document.getElementById('navbar-container');
+            const xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = xhr.responseText;
+
+                        // Append the loaded content to the navbarContainer
+                        while (tempDiv.firstChild) {
+                            navbarContainer.appendChild(tempDiv.firstChild);
+                        }
+                    } else {
+                        console.error('Error loading navbar:', xhr.status);
+                    }
+                }
+            };
+            xhr.open('GET', 'components/navbar.html', true);
+            xhr.send();
+        }
+
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const username = sessionStorage.getItem('username');
+            console.log('Username in sessionStorage:', username);
+
+            loadNavbar();
+
+            if (username) {
+                getMoviesByMovieAndGenre(username);
+                getRecentWatchedRecommendations(username);
+                getRecommendationActorDirector(username);
+            } else {
+                console.log("Username not found in sessionStorage");
+            }
+        });
+
+        function getMoviesByMovieAndGenre(username) {
+            $.ajax({
+                url: 'RabbitMQ/apiConsumer.php',
+                method: 'GET',
+                data: {
+                    type: 'getMoviesByMovieAndGenre',
+                    username: username
+                },
+                dataType: 'json',
+                success: function (response) {
+                    displayRecommendations('movies-by-genre-container', 'Movies by Genre Recommendations', response);
+                },
+                error: handle500Error('movies-by-genre-container', 'Movies by Genre Recommendations')
+            });
+        }
+
+        function getRecentWatchedRecommendations(username) {
+            $.ajax({
+                url: 'RabbitMQ/apiConsumer.php',
+                method: 'GET',
+                data: {
+                    type: 'getRecentWatchedRecommendations',
+                    username: username
+                },
+                dataType: 'json',
+                success: function (response) {
+                    displayRecommendations('recent-watched-container', 'Recent Watched Recommendations', response);
+                },
+                error: handle500Error('recent-watched-container', 'Recent Watched Recommendations')
+            });
+        }
+
+        function getRecommendationActorDirector(username) {
+            $.ajax({
+                url: 'RabbitMQ/apiConsumer.php',
+                method: 'GET',
+                data: {
+                    type: 'recommendationActorDirector',
+                    username: username
+                },
+                dataType: 'json',
+                success: function (response) {
+                    displayRecommendations('actor-director-container', 'Actor/Director Recommendations', response);
+                },
+                error: handle500Error('actor-director-container', 'Actor/Director Recommendations')
+            });
+        }
+
+        function displayRecommendations(containerId, title, recommendations) {
+            const container = document.getElementById(containerId);
+
+            if (recommendations && recommendations.length > 0) {
+                const sectionTitle = document.createElement('h2');
+                sectionTitle.textContent = title;
+                container.appendChild(sectionTitle);
+
+                const movieContainer = document.createElement('div');
+                movieContainer.classList.add('movie-container');
+                container.appendChild(movieContainer);
+
+                recommendations.slice(0, 10).forEach(movie => {
+                    const movieBlock = document.createElement('div');
+                    movieBlock.classList.add('movie-block');
+
+                    const movieTitle = document.createElement('h3');
+                    movieTitle.textContent = movie.Title || movie.title; // Use the correct property based on the data
+                    movieTitle.classList.add('movie-title');
+
+                    const anchor = document.createElement('a');
+                    anchor.href = `movie.html?movieID=${movie.MediaID || movie.MovieID}&Type=${movie.MediaType}`;
+
+                    const image = document.createElement('img');
+                    image.classList.add('movie-image');
+                    image.src = movie.PosterURL || movie.poster_path;
+
+                    anchor.appendChild(image);
+                    anchor.appendChild(movieTitle);
+                    movieBlock.appendChild(anchor);
+
+                    movieContainer.appendChild(movieBlock);
+                });
+
+                // Add style for movie title to limit its width and add ellipsis for overflow
+                const style = document.createElement('style');
+                style.textContent = `
+                    .movie-title {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        margin: 0;
+                    }
+                `;
+                document.head.appendChild(style);
+
+                const scrollButton = document.createElement('button');
+                scrollButton.textContent = 'See More';
+                scrollButton.addEventListener('click', function () {
+                    movieContainer.scrollLeft += 200;
+                });
+                container.appendChild(scrollButton);
+            } else {
+                console.log(`No recommendations found for ${title}`);
+                const noRecommendationsMessage = document.createElement('p');
+                noRecommendationsMessage.textContent = `No recommendations available for ${title}.`;
+                container.appendChild(noRecommendationsMessage);
+            }
+        }
+
+        function handle500Error(containerId, title) {
+            return function(error) {
+                console.error(`Error fetching ${title} recommendations:`, error);
+                if (error.status === 500) {
+                    const container = document.getElementById(containerId);
+                    container.innerHTML = `<p>There was a connectivity issue while fetching ${title} recommendations.</p>`;
+                }
+            };
+        }
+    </script>
+</body>
+</html>
+
+
+
+
