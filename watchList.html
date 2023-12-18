@@ -214,56 +214,36 @@
         }
 
         function moveToWatchedList(movieId, movieTitle, posterURL, year, mediaType) {
-            // Additional logging for debugging
-            console.log('moveToWatchedList called with movieId:', movieId);
+            // Log the type of movieId before conversion
             console.log('Type of movieId before conversion:', typeof movieId);
 
-            // Check if movieId is a valid number
-            if (isNaN(movieId)) {
-                console.error('movieId is not a valid number:', movieId);
-                return;
-            }
+            // Use a temporary variable for conversion
+            const movieIdAsNumber = Number(movieId);
 
-            // Try converting to a number
-            movieId = Number(movieId);
-            console.log('Value of movieId after conversion:', movieId);
-            console.log('Type of movieId after conversion:', typeof movieId);
-
-            // Check again after conversion
-            if (isNaN(movieId)) {
-                console.error('movieId is not a valid number after conversion:', movieId);
-                return;
-            }
-
-            // Additional logging for debugging
-            console.log('sessionStorage username:', sessionStorage.getItem('username'));
-            console.log('movieTitle:', movieTitle);
-            console.log('posterURL:', posterURL);
-            console.log('year:', year);
-            console.log('mediaType:', mediaType);
+            // Log the type of movieId after conversion
+            console.log('Type of movieId after conversion:', typeof movieIdAsNumber);
 
             $.ajax({
                 url: 'RabbitMQ/dbConsumer.php',
                 method: 'POST',
-                data: {
+                data: JSON.stringify({
                     type: 'addToWatchedListAndRemoveFromWatchList',
                     username: sessionStorage.getItem('username'),
-                    MovieID: Number(movieId),
+                    MovieID: movieIdAsNumber,
                     movieTitle: movieTitle,
                     posterURL: posterURL,
                     year: year,
                     mediaType: mediaType
-                },
+                }),
                 dataType: 'json',
+                contentType: 'application/json',  // Set content type to JSON
                 success: function (response) {
                     console.log('Movie moved to the watched list:', response);
-                    console.log('Type of movieId after conversion final:', typeof movieId);
                     // Refresh the watchlist after moving a movie
                     getWatchlist(sessionStorage.getItem('username'));
                 },
                 error: function (error) {
                     console.error('Error moving a movie to the watched list:', error);
-                    console.log('Type of movieId after conversion final broken:', typeof movieId);
                 }
             });
         }
