@@ -137,7 +137,7 @@
                 data: {
                     "type": "addToWatchList",
                     "username": username,
-                    "MovieID": mediaID,
+                    "MovieID": parseInt(mediaID, 10),
                     "movieTitle": mediaRequest[mediaType === 'movie' ? 'Title' : 'name'],
                     "posterURL": mediaRequest.PosterURL,
                     "year": mediaType === 'movie' ? mediaRequest.ReleaseDate.substring(0, 4) : mediaRequest.first_air_date.substring(0, 4),
@@ -159,7 +159,7 @@
                 data: {
                     "type": "addToWatchedList",
                     "username": username,
-                    "MovieID": Number(mediaID),
+                    "MovieID": parseInt(mediaID, 10),
                     "movieTitle": mediaRequest[mediaType === 'movie' ? 'Title' : 'name'],
                     "posterURL": mediaRequest.PosterURL,
                     "year": mediaType === 'movie' ? mediaRequest.ReleaseDate.substring(0, 4) : mediaRequest.first_air_date.substring(0, 4),
