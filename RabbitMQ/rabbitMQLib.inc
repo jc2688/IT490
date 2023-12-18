@@ -18,17 +18,18 @@ class rabbitMQServer
     private $routing_key = '*'; // stores the routing key for binding
     private $exchange_type = "topic"; // stores the exchange type
     private $auto_delete = false; // sets the exchange to not auto-delete
-    private $lastBrokerIndex = 0; // index of the last used broker
-    private $heartbeat = 10; // heartbeat interval
-    private $offlineHosts = []; // array of offline hosts
-    private $retryInterval = 120; // retry interval for offline hosts
-    private $conn; // current rabbit connection
+    private $lastBrokerIndex = 0; // stores the index of the last used broker
+    private $heartbeat = 10; // stores the heartbeat interval
+    private $offlineHosts = []; // stores an array of offline hosts
+    private $retryInterval = 120; // stores the retry interval for offline hosts
+    private $conn; // stores current rabbit connection object
 
     // initializes server settings based on the provided configuration
     function __construct($machine, $server = "rabbitMQ")    
     {
         // load server configurations from class parameter
         $this->machine = getHostInfo(array($machine));
+        
         // assign configuration values from class parameter 
         $this->BROKER_HOSTS = $this->machine[$server]["BROKER_HOSTS"];
         $this->BROKER_PORT = $this->machine[$server]["BROKER_PORT"];
@@ -513,7 +514,8 @@ class rabbitMQClient
             // rethrow exception
             throw $e;
         }
-
+        
+        // gets the response that matches with the ID
         $response = $this->response_queue[$uid] ?? null;
         unset($this->response_queue[$uid]);
         return $response;
