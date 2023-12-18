@@ -17,7 +17,7 @@ function getRecentWatchedRecommendations($username) {
     }
 
     // Connect to the database
-    $conn =     $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn = dbConnect();
 
     // Select the most recent watched movie
     $query = "SELECT movie_id, media_type FROM watched_list WHERE account_id = ? ORDER BY timestamp DESC LIMIT 1";
@@ -44,41 +44,74 @@ function getRecentWatchedRecommendations($username) {
     return $recommendation;
 }
 
-function getPopularRecommendations($apiKey) {
-    // You can implement the logic to get popular recommendations from the API here
-    // Use the $apiKey to make requests to TMDB API
-    // Return an array with the movie or TV show title, media type, and poster path
-    // Example:
-    return [
-        'title' => 'Popular Movie or TV Show',
-        'media_type' => 'movie', // or 'tv'
-        'poster_path' => '/example_poster_path.jpg',
+function getPopularRecommendations() {
+    global $apiKey;
+    $apiEndpoint = 'https://api.themoviedb.org/3/movie/popular';
+    $params = [
+        'api_key' => $apiKey,
+        'language' => 'en-US',
+        'page' => 1,
     ];
+    $url = $apiEndpoint . '?' . http_build_query($params);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($curl);
+    curl_close($curl);
+    $result = json_decode($response, true);
+    if ($result && isset($result['results'])) {
+        $popularMovies = array_slice($result['results'], 0, 10);
+        $formattedMovies = [];
+        foreach ($popularMovies as $movie) {
+            $formattedMovies[] = [
+                'title' => $movie['title'],
+                'poster_path' => 'https://image.tmdb.org/t/p/w500' . $movie['poster_path'],
+                'MovieID' => $movie['id'],
+            ];
+        }
+        return $formattedMovies;
+    } else {
+        return ['error' => 'Unable to fetch popular movies.'];
+    }
 }
 
 function getRecommendationByMovieId($movieId, $mediaType, $apiKey) {
-    // You can implement the logic to get recommendations based on a specific movie from the API here
-    // Use the $apiKey, $movieId, and $mediaType to make requests to TMDB API
-    // Return an array with the movie or TV show title, media type, and poster path
-    // Example:
-    return [
-        'title' => 'Recommended Movie or TV Show',
-        'media_type' => 'movie', // or 'tv'
-        'poster_path' => '/recommended_poster_path.jpg',
-    ];
+	global $apiKey;
+	
+    // Make a request to TMDB API for movie recommendations
+    $url = "https://api.themoviedb.org/3/{$mediaType}/{$movieId}/recommendations?api_key={$apiKey}&language=en-US&page=1";
+
+    // Initialize cURL session
+    $ch = curl_init($url);
+
+    // Set cURL options
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    // Execute cURL session and get the response
+    $response = curl_exec($ch);
+
+    // Close cURL session
+    curl_close($ch);
+
+    // Decode the JSON response
+    $data = json_decode($response, true);
+
+    // Check if there are recommendations
+    if (isset($data['results']) && count($data['results']) > 0) {
+        // Extract information from the first recommended item
+        $recommendation = $data['results'][0];
+        
+        // Return relevant information
+        return [
+            'title' => $recommendation['title'] ?? $recommendation['name'],
+            'media_type' => $mediaType,
+            'poster_path' => $recommendation['poster_path'] ?? '/default_poster.jpg', // Use a default poster path if not available
+        ];
 }
 
-// Example usage:
-$username = 'example_user';
-$apiKey = 'your_tmdb_api_key';
-$result = getRecentWatchedRecommendations($username, $apiKey);
-
-// Output the result
-print_r($result);
 
 function getAccountIdByUsername($username) {
     // This will connect to our databse using our credentials. If there is an error, a message is displayed 
-    $conn =  $conn = new mysqli('10.244.1.2', 'BackEndAdmin', 'Qg5OKQ!?$Q', 'SceneSync');
+    $conn =  dbConnect();
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
@@ -100,12 +133,7 @@ function getAccountIdByUsername($username) {
 }
 
 
-
-
-
 $username = 'Billards27';
-//$password = 'sdf';
-//$email = 'sdf';
 $result = getRecentWatchedRecommendations($username);
 print_r($result);
 
