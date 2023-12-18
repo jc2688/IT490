@@ -214,29 +214,19 @@
         }
 
         function moveToWatchedList(movieId, movieTitle, posterURL, year, mediaType) {
-            // Log the type of movieId before conversion
-            console.log('Type of movieId before conversion:', typeof movieId);
-
-            // Use a temporary variable for conversion
-            const movieIdAsNumber = Number(movieId);
-
-            // Log the type of movieId after conversion
-            console.log('Type of movieId after conversion:', typeof movieIdAsNumber);
-
             $.ajax({
                 url: 'RabbitMQ/dbConsumer.php',
                 method: 'POST',
-                data: JSON.stringify({
+                data: {
                     type: 'addToWatchedListAndRemoveFromWatchList',
                     username: sessionStorage.getItem('username'),
-                    MovieID: movieIdAsNumber,
+                    MovieID: movieId,
                     movieTitle: movieTitle,
                     posterURL: posterURL,
                     year: year,
                     mediaType: mediaType
-                }),
+                },
                 dataType: 'json',
-                contentType: 'application/json',  // Set content type to JSON
                 success: function (response) {
                     console.log('Movie moved to the watched list:', response);
                     // Refresh the watchlist after moving a movie
@@ -247,7 +237,6 @@
                 }
             });
         }
-
 
         function createMovieBlock(movie) {
             const movieBlock = document.createElement('div');

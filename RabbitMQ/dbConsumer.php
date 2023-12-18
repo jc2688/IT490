@@ -8,31 +8,9 @@ require_once('rabbitMQLib.inc');
 $request = array();
 
 // Determine the type of request and populate the $request array
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get the raw POST data
-    $postData = file_get_contents("php://input");
-
-    // Check if the content type is JSON
-    if (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
-        // Decode JSON data
-        $request = json_decode($postData, true);
-
-        // Check for JSON decoding errors
-        if ($request === null) {
-            echo json_encode(["error" => "Invalid JSON data"]);
-            exit;
-        }
-    } else {
-        // Handle URL-encoded data
-        parse_str($postData, $request);
-    }
-
-    // Check if the 'type' field is present
-    if (!isset($request['type'])) {
-        echo json_encode(["error" => "Missing 'type' field"]);
-        exit;
-    }
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["type"])) {
+    $request['type'] = $_POST["type"];
+    
     // Switch case to handle different request types
     switch ($request['type']) {
         // Handle login request
@@ -53,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $request['zipcode'] = $_POST['zipcode'];
             $request['password'] = $_POST['password'];
             break;
-
+        
         // Handle reset password    
         case "resetPassword":
             $request['username'] = $_POST['username'];
@@ -99,23 +77,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $request['watchListID'] = $_POST['watchListID'];
             break;
 
-        // Handle deletion of a movie from the watched list
-        case "deleteFromWatchedList":
-            $request['watchedListID'] = $_POST['watchedListID'];
-            break;
-
         // Default case for invalid request types
         default:
             echo json_encode(["error" => "Invalid POST request type"]);
             exit;
-    }
+    } 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["type"])) {
     $request['type'] = $_GET["type"];
     
     switch ($request['type']) {
         // Handle request for getting the leaderboard
         case "getLeaderboard":
-            // Handle the GET request for the leaderboard here
             break;
 
         // Handle search for movie reviews
