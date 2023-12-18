@@ -22,8 +22,8 @@
 
         .movie-image {
             width: 100%;
-            height: 350px; /* Set a fixed height for all images */
-            object-fit: cover; /* Maintain aspect ratio and cover the entire space */
+            height: 350px; 
+            object-fit: cover; 
         }
 
         .movie-details {
@@ -111,9 +111,9 @@
                 },
                 dataType: 'json',
                 success: function (response) {
-                    displayRecommendations('movies-by-genre-container', 'Movies by Genre Recommendations', response);
+                    displayRecommendations('movies-by-genre-container', 'Popular Recommendations', response);
                 },
-                error: handle500Error('movies-by-genre-container', 'Movies by Genre Recommendations')
+                error: handle500Error('movies-by-genre-container', 'Popular Recommendations')
             });
         }
 
@@ -221,6 +221,9 @@
     </script>
 </body>
 </html>
+
+
+
 
 
 
