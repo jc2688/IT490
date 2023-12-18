@@ -218,10 +218,29 @@
             console.log('moveToWatchedList called with movieId:', movieId);
             console.log('Type of movieId before conversion:', typeof movieId);
 
+            // Check if movieId is a valid number
+            if (isNaN(movieId)) {
+                console.error('movieId is not a valid number:', movieId);
+                return;
+            }
+
             // Try converting to a number
             movieId = Number(movieId);
             console.log('Value of movieId after conversion:', movieId);
             console.log('Type of movieId after conversion:', typeof movieId);
+
+            // Check again after conversion
+            if (isNaN(movieId)) {
+                console.error('movieId is not a valid number after conversion:', movieId);
+                return;
+            }
+
+            // Additional logging for debugging
+            console.log('sessionStorage username:', sessionStorage.getItem('username'));
+            console.log('movieTitle:', movieTitle);
+            console.log('posterURL:', posterURL);
+            console.log('year:', year);
+            console.log('mediaType:', mediaType);
 
             $.ajax({
                 url: 'RabbitMQ/dbConsumer.php',
@@ -248,6 +267,7 @@
                 }
             });
         }
+
 
         function createMovieBlock(movie) {
             const movieBlock = document.createElement('div');
