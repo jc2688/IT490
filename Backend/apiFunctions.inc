@@ -245,6 +245,51 @@ function getMoviesByMovieAndGenre($username) {
 }
 
 
+function getFavoriteMovieTitleByAccountID($accountID) {
+    global $conn;
+    $stmt = $conn->prepare("SELECT FavoriteMovie FROM Profiles WHERE AccountID = ?");
+    $stmt->bind_param("i", $accountID);
+    $stmt->execute();
+    $stmt->bind_result($favoriteMovieTitle);
+    // Fetch the result
+    $stmt->fetch();
+    $stmt->close();
+    return $favoriteMovieTitle;
+}
+function getMovieIdByTitle($title) {
+    global $apiKey;
+    $title = urlencode($title);
+    $url = "https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$title";
+    // Make the API request
+    $response = file_get_contents($url);
+    $data = json_decode($response, true);
+    // Check if there are results
+    if (!empty($data['results'])) {
+        // Assume you only want the first result
+        $movieId = $data['results'][0]['id'];
+        return $movieId;
+    } else {
+        return false; // Movie not found
+    }
+}
+
+
+function getRecommendedMovies($movieId) {
+    global $apiKey;
+    $url = "https://api.themoviedb.org/3/movie/$movieId/recommendations?api_key=$apiKey";
+    // Make the API request
+    $response = file_get_contents($url);
+    $data = json_decode($response, true);
+    // Check if there are results
+    if (!empty($data['results'])) {
+        // You can customize the data retrieval as per your needs
+        return $data['results'];
+    } else {
+        return false; // No recommendations found
+    }
+}
+
+
 
 //isfar
 // This function takes the parameter $username 
