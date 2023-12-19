@@ -18,18 +18,17 @@ class rabbitMQServer
     private $routing_key = '*'; // stores the routing key for binding
     private $exchange_type = "topic"; // stores the exchange type
     private $auto_delete = false; // sets the exchange to not auto-delete
-    private $lastBrokerIndex = 0; // stores the index of the last used broker
-    private $heartbeat = 10; // stores the heartbeat interval
-    private $offlineHosts = []; // stores an array of offline hosts
-    private $retryInterval = 120; // stores the retry interval for offline hosts
-    private $conn; // stores current rabbit connection object
+    private $lastBrokerIndex = 0; // index of the last used broker
+    private $heartbeat = 10; // heartbeat interval
+    private $offlineHosts = []; // array of offline hosts
+    private $retryInterval = 120; // retry interval for offline hosts
+    private $conn; // current rabbit connection
 
     // initializes server settings based on the provided configuration
     function __construct($machine, $server = "rabbitMQ")    
     {
         // load server configurations from class parameter
         $this->machine = getHostInfo(array($machine));
-        
         // assign configuration values from class parameter 
         $this->BROKER_HOSTS = $this->machine[$server]["BROKER_HOSTS"];
         $this->BROKER_PORT = $this->machine[$server]["BROKER_PORT"];
@@ -263,7 +262,7 @@ class rabbitMQServer
     private function consume_messages() 
     {
         // sets the prefetch count to the channel
-        $prefetchCount = 1;
+        $prefetchCount = 5;
         $this->channel->qos(0, $prefetchCount);
 
         // while loop to consume any messages
@@ -299,7 +298,7 @@ class rabbitMQClient
     private $offlineHosts = []; // stores a list of offline hosts
     private $retryInterval = 600; // stores retry interval for offline hosts
     private $conn; // stores current rabbit connection
-    private $consumerTimeout = 30; // stores a connection timeout value in seconds 
+    private $consumerTimeout = 40; // stores a connection timeout value in seconds
 
     // constructor to initialize client settings based on the provided configuration
     function __construct($machine, $server = "rabbitMQ")
@@ -514,8 +513,7 @@ class rabbitMQClient
             // rethrow exception
             throw $e;
         }
-        
-        // gets the response that matches with the ID
+
         $response = $this->response_queue[$uid] ?? null;
         unset($this->response_queue[$uid]);
         return $response;
