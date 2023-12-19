@@ -262,7 +262,7 @@ class rabbitMQServer
     private function consume_messages() 
     {
         // sets the prefetch count to the channel
-        $prefetchCount = 1;
+        $prefetchCount = 5;
         $this->channel->qos(0, $prefetchCount);
 
         // while loop to consume any messages
@@ -298,7 +298,7 @@ class rabbitMQClient
     private $offlineHosts = []; // stores a list of offline hosts
     private $retryInterval = 600; // stores retry interval for offline hosts
     private $conn; // stores current rabbit connection
-    private $consumerTimeout = 30; // stores a connection timeout value in seconds 
+    private $consumerTimeout = 40; // stores a connection timeout value in seconds
 
     // constructor to initialize client settings based on the provided configuration
     function __construct($machine, $server = "rabbitMQ")
